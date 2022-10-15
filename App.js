@@ -1,20 +1,20 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import 'react-native-gesture-handler';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import AuthProvider from './context/AuthContext';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+import AppRoutes from './navigation';
+
+const queryClient = new QueryClient();
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#ffffff' }}>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
+      </QueryClientProvider>
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
