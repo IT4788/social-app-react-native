@@ -16,13 +16,6 @@ npm run lint ||
 (
         echo '😤🏀👋😤 Get that weak s**t out of here! 😤🏀👋😤 
                 ESLint Check Failed. Make the required changes listed above, add changes and try to commit again.'
-        # false; 
-)
-
-# Auto fix Prettier and EsLint error
-npm run fix-all ||
-(
-        echo '😤 Plear fix format and lint error before commit! 😤'
         false; 
 )
 
