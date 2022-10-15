@@ -5,13 +5,13 @@ import AuthStack from './AuthStack';
 import { useAuthContext } from '../context/AuthContext';
 
 const AppRoutes = () => {
-  const { user } = useAuthContext();
+    const { user } = useAuthContext();
 
-  return (
-    <NavigationContainer>
-      {user ? <AppStack /> : <AuthStack />}
-    </NavigationContainer>
-  );
+    return (
+        <NavigationContainer>
+            {user ? <AppStack /> : <AuthStack />}
+        </NavigationContainer>
+    );
 };
 
 export default AppRoutes;
