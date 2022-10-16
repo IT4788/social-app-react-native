@@ -4,9 +4,13 @@ import { TextInput } from 'react-native-paper';
 import AppInput from '../../../components/AppInput';
 import { FormContainer, FormGroup, StretchContainer } from './styles';
 import AppButton from '../../../components/AppButton';
-import { AdaptiveButtonContainer } from '../../../components/common';
+import { AdaptiveContainer } from '../../../components/common';
 
-const LoginScreen = () => {
+const LoginScreen = ({ navigation }) => {
+  const navigateToSRegisterScreen = () => {
+    navigation.navigate('Register');
+  };
+
   return (
     <ScrollView
       contentContainerStyle={{
@@ -36,15 +40,17 @@ const LoginScreen = () => {
             />
           </FormGroup>
           <AppButton>LOGIN</AppButton>
-          <AdaptiveButtonContainer>
+          <AdaptiveContainer>
             <AppButton mode="text" style={{ marginTop: 10 }}>
               Forgot Password?
             </AppButton>
-          </AdaptiveButtonContainer>
+          </AdaptiveContainer>
         </StretchContainer>
-        <AdaptiveButtonContainer>
-          <AppButton mode="outlined">CREATE NEXT SOCIAL ACCOUNT</AppButton>
-        </AdaptiveButtonContainer>
+        <AdaptiveContainer>
+          <AppButton mode="outlined" onPress={navigateToSRegisterScreen}>
+            CREATE NEXT SOCIAL ACCOUNT
+          </AppButton>
+        </AdaptiveContainer>
       </FormContainer>
     </ScrollView>
   );

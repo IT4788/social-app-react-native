@@ -28,19 +28,14 @@ const AuthStack = () => {
   if (isFirstLaunch === null) return null;
 
   return (
-    <RootStack.Navigator initialRouteName="Onboarding">
+    <RootStack.Navigator
+      screenOptions={{ headerShown: false }}
+      initialRouteName="Onboarding"
+    >
       {isFirstLaunch && (
-        <RootStack.Screen
-          options={{ headerShown: false }}
-          name="Onboarding"
-          component={OnboardingScreen}
-        />
+        <RootStack.Screen name="Onboarding" component={OnboardingScreen} />
       )}
-      <RootStack.Screen
-        options={{ headerShown: false }}
-        name="Login"
-        component={LoginScreen}
-      />
+      <RootStack.Screen name="Login" component={LoginScreen} />
       <RootStack.Screen name="Register" component={RegisterScreen} />
     </RootStack.Navigator>
   );
