@@ -12,19 +12,19 @@ import theme from './theme/theme';
 const queryClient = new QueryClient();
 
 export default function App() {
-    const { fontsLoaded, onLayoutRootView } = useFonts();
+  const { fontsLoaded, onLayoutRootView } = useFonts();
 
-    if (!fontsLoaded) return null;
+  if (!fontsLoaded) return null;
 
-    return (
-        <ThemeProvider theme={theme}>
-            <SafeAreaView style={{ flex: 1 }} onLayout={onLayoutRootView}>
-                <QueryClientProvider client={queryClient}>
-                    <AuthProvider>
-                        <AppRoutes />
-                    </AuthProvider>
-                </QueryClientProvider>
-            </SafeAreaView>
-        </ThemeProvider>
-    );
+  return (
+    <ThemeProvider theme={theme}>
+      <SafeAreaView style={{ flex: 1 }} onLayout={onLayoutRootView}>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <AppRoutes />
+          </AuthProvider>
+        </QueryClientProvider>
+      </SafeAreaView>
+    </ThemeProvider>
+  );
 }
