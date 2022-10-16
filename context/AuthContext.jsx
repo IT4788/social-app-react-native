@@ -6,10 +6,10 @@ import { createContext } from 'react';
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
-    const [user] = useState(null);
-    return (
-        <AuthContext.Provider value={{ user }}>{children}</AuthContext.Provider>
-    );
+  const [user] = useState(null);
+  return (
+    <AuthContext.Provider value={{ user }}>{children}</AuthContext.Provider>
+  );
 };
 
 export const useAuthContext = () => useContext(AuthContext);
