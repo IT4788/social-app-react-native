@@ -2,7 +2,7 @@
 
 -   Là một project react native
 -   Là một social app mobile
--   Công nghệ sử dụng: React Native ([Expo](<[http](https://expo.dev/)>) template ), React Query, React Hook Form, React Native Paper và một số npm package khác
+-   Công nghệ sử dụng: React Native ([Expo](<[http](https://expo.dev/)>) template), React Query, React Hook Form, React Native Paper, styled-components và một số npm packages khác
 
 ## Environment Setup
 
@@ -24,7 +24,7 @@
 -   Clone project
 
 ```
- git clone https://github.com/luongdao138/social-app-react-native.git
+ git clone https://github.com/IT4788/social-app-react-native.git
 ```
 
 -   Install Dependencies
@@ -47,6 +47,10 @@ Nếu dùng yarn
  npm start (yarn start)
 ```
 
--   Nếu chạy trên **Android**, cần phải cài Expo Go trên **GooglePlay** để test app
+## Run Project
 
--   Dùng Expo Go quét mã QR sau khi khởi động server để test
+-   Nếu chạy trên **Android**, cần phải cài **Expo Go** trên **GooglePlay** để test app
+
+-   Dùng **Expo Go** quét mã QR sau khi khởi động server để test, hoặc sử dụng **AVD** trên **Android Studio** để test
+
+-   Nên sử dụng app **Expo Go** để test vì dùng windows nên Android Studio khá **nặng và chậm**)
