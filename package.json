@@ -27,6 +27,8 @@
         "axios": "^1.1.2",
         "dayjs": "^1.11.5",
         "expo": "~46.0.16",
+        "expo-font": "~10.2.0",
+        "expo-splash-screen": "^0.16.2",
         "expo-status-bar": "~1.4.0",
         "npm": "^8.19.2",
         "rea": "^0.0.1",

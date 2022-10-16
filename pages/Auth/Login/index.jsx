@@ -1,10 +1,11 @@
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
 import React from 'react';
+import AppText from '../../../components/AppText';
 
 const LoginScreen = () => {
     return (
         <View>
-            <Text>Login Screen</Text>
+            <AppText>Login Screen</AppText>
         </View>
     );
 };
