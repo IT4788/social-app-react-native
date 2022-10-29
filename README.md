@@ -2,7 +2,7 @@
 
 - Là một project react native
 - Là một social app mobile
-- Công nghệ sử dụng: React Native ([Expo](<[http](https://expo.dev/)>) template), React Query, React Hook Form, React Native Paper, styled-components và một số npm packages khác
+- Công nghệ sử dụng: React Native ([Expo](https://expo.dev/) template), React Query, React Hook Form, React Native Paper, styled-components và một số npm packages khác
 
 ## Environment Setup
 
