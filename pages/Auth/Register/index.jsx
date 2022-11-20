@@ -1,14 +1,37 @@
 import { ImageBackground, ScrollView } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import AppInput from '../../../components/AppInput';
-import { FormCol2, FormContainer, FormGroup, StretchContainer } from './styles';
+import { FormContainer, FormGroup, StretchContainer } from './styles';
 import AppButton from '../../../components/AppButton';
 import { AdaptiveContainer } from '../../../components/common';
-import AppRadioGroup from '../../../components/AppRadioGroup';
+// import AppRadioGroup from '../../../components/AppRadioGroup';
+import client from '../../../services/client';
+// import { TextInput } from 'react-native-paper';
 
 const RegisterScreen = ({ navigation }) => {
+  const [registerData, setRegisterData] = useState({
+    phone: '',
+    username: '',
+    password: '',
+    passwordConfirmation: '',
+  });
+
+  const handleChange = (name, value) => {
+    setRegisterData({ ...registerData, [name]: value });
+  };
+
   const navigateToLoginScreen = () => {
     navigation.navigate('Login');
+  };
+
+  const handleRegister = async () => {
+    try {
+      const data = Object.assign(registerData, { countryCode: '+84' });
+      await client.post('auth/sign_up', data);
+      navigateToLoginScreen();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -26,30 +49,60 @@ const RegisterScreen = ({ navigation }) => {
       />
       <FormContainer>
         <StretchContainer style={{ marginBottom: 40 }}>
-          <FormCol2>
+          {/* <FormCol2>
             <StretchContainer style={{ marginRight: 10 }}>
-              <AppInput placeholder="First Name" />
+              <AppInput placeholder="Username Name" />
             </StretchContainer>
             <StretchContainer style={{ marginLeft: 10 }}>
               <AppInput placeholder="Last Name" />
             </StretchContainer>
-          </FormCol2>
+          </FormCol2> */}
           <FormGroup>
-            <AppInput placeholder="Email or phone" />
+            <AppInput
+              placeholder="Phone number"
+              name="phone"
+              value={registerData.phone}
+              onChangeText={(text) => handleChange('phone', text)}
+            />
           </FormGroup>
           <FormGroup>
-            <AppInput placeholder="New password" secureTextEntry />
+            <AppInput
+              placeholder="Username"
+              name="username"
+              value={registerData.username}
+              onChangeText={(text) => handleChange('username', text)}
+            />
           </FormGroup>
           <FormGroup>
+            <AppInput
+              placeholder="New password"
+              name="password"
+              secureTextEntry
+              value={registerData.password}
+              onChangeText={(text) => handleChange('password', text)}
+            />
+          </FormGroup>
+          <FormGroup>
+            <AppInput
+              placeholder="Confirm password"
+              name="passwordConfirmation"
+              secureTextEntry
+              value={registerData.passwordConfirmation}
+              onChangeText={(text) =>
+                handleChange('passwordConfirmation', text)
+              }
+            />
+          </FormGroup>
+          {/* <FormGroup>
             <AppRadioGroup
               options={[
                 { label: 'Male', value: 'male' },
                 { label: 'Female', value: 'female' },
               ]}
             />
-          </FormGroup>
+          </FormGroup> */}
 
-          <AppButton>Register</AppButton>
+          <AppButton onPress={handleRegister}>Register</AppButton>
         </StretchContainer>
         <AdaptiveContainer>
           <AppButton mode="outlined" onPress={navigateToLoginScreen}>

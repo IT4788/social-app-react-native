@@ -18,7 +18,7 @@
   "dependencies": {
     "-": "^0.0.1",
     "@expo/webpack-config": "^0.17.0",
-    "@react-native-async-storage/async-storage": "^1.17.10",
+    "@react-native-async-storage/async-storage": "~1.17.3",
     "@react-navigation/drawer": "^6.5.0",
     "@react-navigation/material-bottom-tabs": "^6.2.4",
     "@react-navigation/native": "^6.0.13",
@@ -37,6 +37,7 @@
     "react-dom": "18.0.0",
     "react-hook-form": "^7.37.0",
     "react-native": "0.69.6",
+    "react-native-device-info": "^10.3.0",
     "react-native-emoticons": "^1.0.13",
     "react-native-gesture-handler": "~2.5.0",
     "react-native-onboarding-swiper": "^1.2.0",

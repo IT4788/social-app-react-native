@@ -1,21 +1,45 @@
 import { ImageBackground, ScrollView } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import { TextInput } from 'react-native-paper';
 import AppInput from '../../../components/AppInput';
 import { FormContainer, FormGroup, StretchContainer } from './styles';
 import AppButton from '../../../components/AppButton';
 import { AdaptiveContainer } from '../../../components/common';
 import { useAuthContext } from '../../../context/AuthContext';
+import client from '../../../services/client';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+// import { getDeviceId } from 'react-native-device-info';
 
 const LoginScreen = ({ navigation }) => {
-  const { setUser } = useAuthContext();
+  // const deviceId = getDeviceId();
+  const { getUserInfo } = useAuthContext();
+  const [loginData, setLoginData] = useState({
+    phone: '',
+    password: '',
+  });
 
-  const navigateToSRegisterScreen = () => {
-    navigation.navigate('Register');
+  const handleChange = (name, value) => {
+    setLoginData({ ...loginData, [name]: value });
   };
 
-  const handleLogin = () => {
-    setUser({ email: 'daovanluongpdl@gmail.com' });
+  const handleLogin = async () => {
+    try {
+      const data = Object.assign(loginData, { deviceId: '1242#CDSA' });
+      const { data: loginRes } = await client.patch('auth/sign_in', data);
+      await AsyncStorage.setItem('accessToken', loginRes.data.accessToken);
+
+      console.log({ loginRes });
+
+      await getUserInfo();
+      // navigation.replace('Home');
+      // navigateToLoginScreen();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const navigateToRegisterScreen = () => {
+    navigation.navigate('Register');
   };
 
   return (
@@ -37,6 +61,8 @@ const LoginScreen = ({ navigation }) => {
             <AppInput
               placeholder="Email or phone"
               left={<TextInput.Icon icon="email-outline" />}
+              value={loginData.phone}
+              onChangeText={(text) => handleChange('phone', text)}
             />
           </FormGroup>
           <FormGroup>
@@ -44,6 +70,8 @@ const LoginScreen = ({ navigation }) => {
               left={<TextInput.Icon icon="lock-outline" />}
               placeholder="Password"
               secureTextEntry
+              value={loginData.password}
+              onChangeText={(text) => handleChange('password', text)}
             />
           </FormGroup>
           <AppButton onPress={handleLogin}>LOGIN</AppButton>
@@ -54,7 +82,7 @@ const LoginScreen = ({ navigation }) => {
           </AdaptiveContainer>
         </StretchContainer>
         <AdaptiveContainer>
-          <AppButton mode="outlined" onPress={navigateToSRegisterScreen}>
+          <AppButton mode="outlined" onPress={navigateToRegisterScreen}>
             CREATE NEXT SOCIAL ACCOUNT
           </AppButton>
         </AdaptiveContainer>

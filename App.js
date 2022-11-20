@@ -8,6 +8,7 @@ import { Provider as ThemeProvider } from 'react-native-paper';
 import AppRoutes from './navigation';
 import useFonts from './hooks/useFonts';
 import theme from './theme/theme';
+import { StatusBar } from 'react-native';
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ export default function App() {
         <SafeAreaView style={{ flex: 1 }} onLayout={onLayoutRootView}>
           <QueryClientProvider client={queryClient}>
             <AuthProvider>
+              <StatusBar backgroundColor="#06bcee" />
               <AppRoutes />
             </AuthProvider>
           </QueryClientProvider>

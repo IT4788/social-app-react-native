@@ -3,13 +3,27 @@ import { NavigationContainer } from '@react-navigation/native';
 import AppStack from './AppStack';
 import AuthStack from './AuthStack';
 import { useAuthContext } from '../context/AuthContext';
+import SplashScreen from '../pages/SplashScreen';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+const Stack = createNativeStackNavigator();
 
 const AppRoutes = () => {
-  const { user } = useAuthContext();
+  const { user, isSplashLoading } = useAuthContext();
 
   return (
     <NavigationContainer>
-      {user ? <AppStack /> : <AuthStack />}
+      {isSplashLoading ? (
+        <Stack.Screen
+          component={SplashScreen}
+          name="Spash"
+          options={{ headerShown: false }}
+        />
+      ) : user ? (
+        <AppStack />
+      ) : (
+        <AuthStack />
+      )}
     </NavigationContainer>
   );
 };
