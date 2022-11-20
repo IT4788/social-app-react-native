@@ -1,5 +1,5 @@
 const AppColors = {
-  primary: '#3C5B92',
+  primary: '#1877f2',
 };
 
 export default AppColors;

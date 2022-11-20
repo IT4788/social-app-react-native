@@ -37,13 +37,17 @@ const NotificationStackScreen = () => (
 
 export const TabNavigator = () => {
   return (
-    <Tab.Navigator shifting initialRouteName="Home" activeColor="#fff">
+    <Tab.Navigator
+      labeled={false}
+      shifting
+      initialRouteName="Home"
+      activeColor="#fff"
+    >
       <Tab.Screen
         name="HomeStack"
         component={HomeStackScreen}
         options={{
           tabBarColor: '#009387',
-          tabBarLabel: 'Home',
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons name="home" color={color} size={26} />
           ),
@@ -54,7 +58,6 @@ export const TabNavigator = () => {
         component={ProfileStackScreen}
         options={{
           tabBarColor: '#d02860',
-          tabBarLabel: 'Profile',
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons name="account" color={color} size={26} />
           ),
@@ -65,7 +68,6 @@ export const TabNavigator = () => {
         component={NotificationStackScreen}
         options={{
           tabBarColor: '#694fad',
-          tabBarLabel: 'Notification',
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons name="bell" color={color} size={26} />
           ),

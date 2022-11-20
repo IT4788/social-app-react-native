@@ -5,10 +5,17 @@ import AppInput from '../../../components/AppInput';
 import { FormContainer, FormGroup, StretchContainer } from './styles';
 import AppButton from '../../../components/AppButton';
 import { AdaptiveContainer } from '../../../components/common';
+import { useAuthContext } from '../../../context/AuthContext';
 
 const LoginScreen = ({ navigation }) => {
+  const { setUser } = useAuthContext();
+
   const navigateToSRegisterScreen = () => {
     navigation.navigate('Register');
+  };
+
+  const handleLogin = () => {
+    setUser({ email: 'daovanluongpdl@gmail.com' });
   };
 
   return (
@@ -39,7 +46,7 @@ const LoginScreen = ({ navigation }) => {
               secureTextEntry
             />
           </FormGroup>
-          <AppButton>LOGIN</AppButton>
+          <AppButton onPress={handleLogin}>LOGIN</AppButton>
           <AdaptiveContainer>
             <AppButton mode="text" style={{ marginTop: 10 }}>
               Forgot Password?
