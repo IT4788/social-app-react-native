@@ -16,6 +16,7 @@ import AppColors from '../../../theme/AppColors';
 import { Avatar, Button, TextInput } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
 import { v4 as uuid } from 'uuid';
+import client from '../../../services/client';
 
 const Container = styled.SafeAreaView`
   background-color: #fff;
@@ -121,6 +122,7 @@ Footer.Icons = styled(View)`
 const MAX_IMAGE_ALLOWED = 4;
 
 const AddPostScreen = ({ navigation }) => {
+  const [text, setText] = useState('');
   const [images, setImages] = useState([]);
   const handleSelectPhoto = async () => {
     if (Platform.OS !== 'web') {
@@ -158,6 +160,14 @@ const AddPostScreen = ({ navigation }) => {
     }
   };
 
+  const handleSubmit = () => {
+    console.log({ text });
+    client.post('post', { describe: text }).then((res) => {
+      console.log(res);
+      navigation.push('Home');
+    });
+  };
+
   return (
     <>
       {/* <ScrollView style={{ backgroundColor: '#fff', height: '100%' }}> */}
@@ -174,7 +184,7 @@ const AddPostScreen = ({ navigation }) => {
               Tạo bài viết
             </AppText>
           </View>
-          <SubmitBtn>
+          <SubmitBtn onPress={handleSubmit}>
             <SubmitBtnText>ĐĂNG</SubmitBtnText>
           </SubmitBtn>
         </Header>
@@ -209,6 +219,8 @@ const AddPostScreen = ({ navigation }) => {
               underlineColor="transparent"
               placeholder="Bạn đang nghĩ gì?"
               multiline
+              value={text}
+              onChangeText={(newText) => setText(newText)}
             />
 
             <Content.ImageContainer>
