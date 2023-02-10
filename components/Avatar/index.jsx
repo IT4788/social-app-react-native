@@ -10,7 +10,7 @@ const Container = styled.View`
 const User = styled.Image`
   width: ${({ width }) => `${width}px`};
   height: ${({ width }) => `${width}px`};
-  border-radius: 20px;
+  border-radius: 100000px;
   border-color: #1777f2;
   border-width: ${(props) => (props.story ? '3px' : 0)};
 `;

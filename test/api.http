@@ -1,6 +1,7 @@
 
 ### Base Url
-@baseUrl = https://fbcloneapi.onrender.com/api/v1
+# @baseUrl = https://fbcloneapi.onrender.com/api/v1
+@baseUrl = http://localhost:8000/api/v1
 
 ### 1. Sign Up => signup
 POST {{baseUrl}}/auth/sign_up
@@ -9,7 +10,7 @@ Content-Type: application/json
 
 {
     "phone": "0358446198",
-    "username": "daovanluong",
+    "username": "daoluong",
     "password": "1234567@",
     "passwordConfirmation":"1234567@",
     "countryCode": "+84"
@@ -37,6 +38,13 @@ Authorization: Bearer {{authToken}}
 
 ### 4. Get user info => get_user_info
 GET {{baseUrl}}/user
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+### Get user profile
+@userId = 63e60d4393d45a34d106754c
+GET {{baseUrl}}/user/{{userId}}/profile
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{authToken}}

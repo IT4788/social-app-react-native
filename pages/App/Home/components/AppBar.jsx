@@ -28,7 +28,7 @@ const Button = styled.TouchableOpacity`
   background: #eeeeee;
   align-items: center;
   justify-content: center;
-  margin-left: 16px;
+  margin-left: 6px;
 `;
 
 const AppBar = () => {
@@ -36,17 +36,25 @@ const AppBar = () => {
     navigation.navigate('Notifications');
   };
 
+  const onPressMenu = () => {
+    navigation.navigate('MyPage');
+  };
+
   return (
     <Container>
       <Text>facebook</Text>
       <Row>
         <Button onPress={onPressNotification}>
-          <Ionicons name="notifications-outline" size={29} color="black" />
-          {/* <Feather name="search" size={29} color="black" /> */}
+          <Ionicons name="notifications-outline" size={24} color="black" />
+          {/* <Feather name="search" size={24} color="black" /> */}
         </Button>
 
         <Button>
-          <MaterialCommunityIcons name="facebook-messenger" size={29} />
+          <MaterialCommunityIcons name="facebook-messenger" size={24} />
+        </Button>
+
+        <Button onPress={onPressMenu}>
+          <Ionicons name="menu-outline" size={24} color="black" />
         </Button>
       </Row>
     </Container>

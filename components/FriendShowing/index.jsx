@@ -78,6 +78,16 @@ const FriendsShowing = ({ friends, isUserX, myFriends }) => {
           View all friends
         </Text>
       </TouchableOpacity>
+
+      {/* <TouchableOpacity
+        onPress={onPressViewAllFriendsHandler}
+        activeOpacity={0.8}
+        style={styles.btnViewAllFriends}
+      >
+        <Text style={{ fontSize: 16, fontWeight: '500' }}>
+          View requested friends
+        </Text>
+      </TouchableOpacity> */}
     </View>
   );
 };

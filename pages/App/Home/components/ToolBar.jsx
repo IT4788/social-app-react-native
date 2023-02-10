@@ -11,6 +11,8 @@ import {
 
 import Avatar from './Avatar';
 import { TouchableOpacity } from 'react-native';
+import { useAuthContext } from '../../../../context/AuthContext';
+import { getUserAvatar } from '../../../../utils/image';
 
 const Container = styled.View`
   width: 100%;
@@ -67,6 +69,8 @@ const BottomDivider = styled.View`
 `;
 
 const ToolBar = () => {
+  const { user } = useAuthContext();
+
   const onClickAddPost = () => {
     navigation.navigate('AddPost');
   };
@@ -79,7 +83,7 @@ const ToolBar = () => {
               navigation.navigate('Profile');
             }}
           >
-            <Avatar source={require('../../../../assets/images/user1.jpg')} />
+            <Avatar source={{ uri: getUserAvatar(user) }} />
           </TouchableOpacity>
           <InpuBox onPress={onClickAddPost}>
             <AppText>Bạn đang nghĩ gì</AppText>

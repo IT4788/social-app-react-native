@@ -2,7 +2,12 @@ import { ImageBackground, ScrollView } from 'react-native';
 import React, { useState } from 'react';
 import { TextInput } from 'react-native-paper';
 import AppInput from '../../../components/AppInput';
-import { FormContainer, FormGroup, StretchContainer } from './styles';
+import {
+  ErrorMessage,
+  FormContainer,
+  FormGroup,
+  StretchContainer,
+} from './styles';
 import AppButton from '../../../components/AppButton';
 import { AdaptiveContainer } from '../../../components/common';
 import { useAuthContext } from '../../../context/AuthContext';
@@ -17,6 +22,7 @@ const LoginScreen = ({ navigation }) => {
     phone: '',
     password: '',
   });
+  const [error, setError] = useState(null);
 
   const handleChange = (name, value) => {
     setLoginData({ ...loginData, [name]: value });
@@ -34,6 +40,7 @@ const LoginScreen = ({ navigation }) => {
       // navigation.replace('Home');
       // navigateToLoginScreen();
     } catch (error) {
+      setError('Credentials are not correct!');
       console.log(error);
     }
   };
@@ -59,8 +66,8 @@ const LoginScreen = ({ navigation }) => {
         <StretchContainer style={{ marginBottom: 40 }}>
           <FormGroup>
             <AppInput
-              placeholder="Email or phone"
-              left={<TextInput.Icon icon="email-outline" />}
+              placeholder="Phone number"
+              left={<TextInput.Icon icon="phone-outline" />}
               value={loginData.phone}
               onChangeText={(text) => handleChange('phone', text)}
             />
@@ -75,6 +82,7 @@ const LoginScreen = ({ navigation }) => {
             />
           </FormGroup>
           <AppButton onPress={handleLogin}>LOGIN</AppButton>
+          {error && <ErrorMessage>{error}</ErrorMessage>}
           <AdaptiveContainer>
             <AppButton mode="text" style={{ marginTop: 10 }}>
               Forgot Password?

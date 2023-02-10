@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useContext } from 'react';
 import { createContext } from 'react';
 import client from '../services/client';
+import * as navigation from '../navigation/helpers';
 
 const AuthContext = createContext();
 
@@ -18,6 +19,7 @@ const AuthProvider = ({ children }) => {
       console.log('Get user info success: ', res.data);
       setUser(res.data?.data?.user);
     } catch (error) {
+      console.log(error);
       if (error.response.status === 401) {
         setUser(null);
         await AsyncStorage.removeItem('accessToken');
@@ -27,13 +29,24 @@ const AuthProvider = ({ children }) => {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await client.patch('auth/sign_out');
+      setUser(null);
+      await AsyncStorage.removeItem('accessToken');
+      navigation.replace('Login');
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     getUserInfo();
   }, []);
 
   return (
     <AuthContext.Provider
-      value={{ user, setUser, getUserInfo, isSplashLoading }}
+      value={{ user, setUser, getUserInfo, isSplashLoading, handleLogout }}
     >
       {children}
     </AuthContext.Provider>

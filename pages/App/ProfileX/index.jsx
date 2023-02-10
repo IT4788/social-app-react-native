@@ -19,12 +19,26 @@ import HightlightPhotos from '../../../components/HightlightPhotos';
 import ToolBar from '../Home/components/ToolBar';
 import AppText from '../../../components/AppText';
 import * as navigation from '../../../navigation/helpers';
+// import { useQuery } from '@tanstack/react-query';
+// import { useRoute } from '@react-navigation/native';
+// import { getUserProfile } from '../../../services/user';
+// import { useAuthContext } from '../../../context/AuthContext';
 
 const ProfileXScreen = () => {
+  // const route = useRoute();
+  // const { user } = useAuthContext();
+  // const id = user?.id;
   const isFriend = true;
   function onPressGoBackHandler() {
     navigation.goBack();
   }
+
+  // const {} = useQuery(['user', 'profile', id], () => getUserProfile(id), {
+  //   onSuccess(data) {
+  //     console.log(data);
+  //   },
+  //   enabled: !!id,
+  // });
 
   return (
     <View style={styles.superContainer}>

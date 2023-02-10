@@ -12,6 +12,7 @@ import EditPublicInfo from '../pages/App/EditPublicInfo';
 import FullFriendsScreen from '../pages/App/FullFriends';
 import NotificationScreen from '../pages/App/Notifications';
 import { TabNavigator } from './TabNavigator';
+import MyPageScreen from '../pages/App/MyPage';
 
 const RootStack = createNativeStackNavigator();
 
@@ -66,6 +67,11 @@ const AppStack = () => {
       <RootStack.Screen
         name="Notifications"
         component={NotificationScreen}
+        options={{ headerShown: false }}
+      />
+      <RootStack.Screen
+        name="MyPage"
+        component={MyPageScreen}
         options={{ headerShown: false }}
       />
       <RootStack.Screen name="Explore" component={ExploreScreen} />
