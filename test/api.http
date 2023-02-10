@@ -1,0 +1,126 @@
+
+### Base Url
+@baseUrl = https://fbcloneapi.onrender.com/api/v1
+
+### 1. Sign Up => signup
+POST {{baseUrl}}/auth/sign_up
+Accept: application/json
+Content-Type: application/json
+
+{
+    "phone": "0358446198",
+    "username": "daovanluong",
+    "password": "1234567@",
+    "passwordConfirmation":"1234567@",
+    "countryCode": "+84"
+}
+
+### 2. Login => login
+# @name login
+PATCH  {{baseUrl}}/auth/sign_in
+Accept: application/json
+Content-Type: application/json
+
+{
+    "phone": "0358446198",
+    "password": "1234567@",
+    "deviceId": "1242#CDSA"
+}
+
+### Auth Token
+@authToken = {{login.response.body.$.data.accessToken}}
+
+### 3. Logout => logout
+PATCH  {{baseUrl}}/auth/sign_out
+Accept: application/json
+Authorization: Bearer {{authToken}}
+
+### 4. Get user info => get_user_info
+GET {{baseUrl}}/user
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+### 5. Update user profile => set_user_info
+PUT {{baseUrl}}/user
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+    "phone": "0123344445",
+    "username": "daovanluong123",
+    "firstName": "dao",
+    "lastName": "luong",
+    "gender": "MALE",
+    "date_of_birth": "12-10-2001",
+    "description":"dcdcdc",
+    "address": "hai ba trung",
+    "city": "Ha Noi",
+    "country": "Viet Nam",
+    "avatar": "cdcdc",
+    "cover_image": "dcdc"
+}
+
+
+### 6. Add post => add_post
+
+
+### 7. Edit post => edit_post
+
+
+### 8. Delete post => delete_post
+
+
+### 9. Get newfeed, get user posts => get_list_posts
+
+
+### 10. Like post => like_post
+
+
+### 11. Get post comments => get_comment
+
+
+### 11. Comment on a post => set_comment
+
+
+### 12. Get user friends => get_user_friends
+
+
+### 13. Request friend
+
+
+### 14. Accept Friend
+
+
+### 15. Get list requested friends
+
+
+### 16. Change user password
+
+
+### 17. Block friends
+
+
+### 18. Get list blocked friends
+
+
+### 22. Get list suggested friends
+
+
+### 19. Get list conversations
+
+
+### 20. Get conversation
+
+
+### 21. Delete conversation
+
+
+### 23. Set read message
+
+
+### 24. Send message
+
+
+### 25. Delete message

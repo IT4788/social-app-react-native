@@ -1,8 +1,8 @@
 import React from 'react';
 
 import styled from 'styled-components/native';
-
-import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import * as navigation from '../../../../navigation/helpers';
+import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 
 const Container = styled.View`
   width: 100%;
@@ -32,12 +32,17 @@ const Button = styled.TouchableOpacity`
 `;
 
 const AppBar = () => {
+  const onPressNotification = () => {
+    navigation.navigate('Notifications');
+  };
+
   return (
     <Container>
       <Text>facebook</Text>
       <Row>
-        <Button>
-          <Feather name="search" size={29} color="black" />
+        <Button onPress={onPressNotification}>
+          <Ionicons name="notifications-outline" size={29} color="black" />
+          {/* <Feather name="search" size={29} color="black" /> */}
         </Button>
 
         <Button>

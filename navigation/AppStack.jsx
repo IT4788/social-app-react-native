@@ -4,17 +4,25 @@ import ExploreScreen from '../pages/App/Explore';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from '../pages/App/Home';
 import AddPostScreen from '../pages/App/AddPost';
+import PostDetailScreen from '../pages/App/PostDetail';
+import CommentsScreen from '../pages/App/Comments';
+import ProfileScreen from '../pages/App/Profile';
+import ProfileXScreen from '../pages/App/ProfileX';
+import EditPublicInfo from '../pages/App/EditPublicInfo';
+import FullFriendsScreen from '../pages/App/FullFriends';
+import NotificationScreen from '../pages/App/Notifications';
+import { TabNavigator } from './TabNavigator';
 
 const RootStack = createNativeStackNavigator();
 
 const AppStack = () => {
   return (
     <RootStack.Navigator initialRouteName="Home">
-      {/* <RootStack.Screen
+      <RootStack.Screen
         name="TabNavigator"
         component={TabNavigator}
         options={{ headerShown: false }}
-      /> */}
+      />
       <RootStack.Screen
         name="Home"
         component={HomeScreen}
@@ -23,6 +31,41 @@ const AppStack = () => {
       <RootStack.Screen
         name="AddPost"
         component={AddPostScreen}
+        options={{ headerShown: false }}
+      />
+      <RootStack.Screen
+        name="PostDetail"
+        component={PostDetailScreen}
+        options={{ headerShown: false }}
+      />
+      <RootStack.Screen
+        name="Comments"
+        component={CommentsScreen}
+        options={{ headerShown: false }}
+      />
+      <RootStack.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{ headerShown: false }}
+      />
+      <RootStack.Screen
+        name="ProfileX"
+        component={ProfileXScreen}
+        options={{ headerShown: false }}
+      />
+      <RootStack.Screen
+        name="EditPublicInfo"
+        component={EditPublicInfo}
+        options={{ headerShown: false }}
+      />
+      <RootStack.Screen
+        name="FullFriends"
+        component={FullFriendsScreen}
+        options={{ headerShown: false }}
+      />
+      <RootStack.Screen
+        name="Notifications"
+        component={NotificationScreen}
         options={{ headerShown: false }}
       />
       <RootStack.Screen name="Explore" component={ExploreScreen} />

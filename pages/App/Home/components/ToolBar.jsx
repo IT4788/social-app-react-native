@@ -1,6 +1,7 @@
 import React from 'react';
 import AppText from '../../../../components/AppText';
 import styled from 'styled-components';
+import * as navigation from '../../../../navigation/helpers';
 
 import {
   Ionicons,
@@ -65,7 +66,7 @@ const BottomDivider = styled.View`
   background: #f0f2f5;
 `;
 
-const ToolBar = ({ navigation }) => {
+const ToolBar = () => {
   const onClickAddPost = () => {
     navigation.navigate('AddPost');
   };
@@ -73,7 +74,13 @@ const ToolBar = ({ navigation }) => {
     <>
       <Container>
         <HeaderRow>
-          <Avatar source={require('../../../../assets/images/user1.jpg')} />
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate('Profile');
+            }}
+          >
+            <Avatar source={require('../../../../assets/images/user1.jpg')} />
+          </TouchableOpacity>
           <InpuBox onPress={onClickAddPost}>
             <AppText>Bạn đang nghĩ gì</AppText>
           </InpuBox>

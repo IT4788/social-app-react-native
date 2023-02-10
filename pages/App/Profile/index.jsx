@@ -1,20 +1,505 @@
 import React from 'react';
-import { Text, View } from 'react-native';
-import { Button } from 'react-native-paper';
+// import { Button } from 'react-native-paper';
+import {
+  Text,
+  StyleSheet,
+  View,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  Dimensions,
+} from 'react-native';
+import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
+// import { useAuthContext } from '../../../context/AuthContext';
+import HightlightPhotos from '../../../components/HightlightPhotos';
+import ToolBar from '../Home/components/ToolBar';
+import FriendsShowing from '../../../components/FriendShowing';
+import Post from '../../../components/Post';
+import * as navigation from '../../../navigation/helpers';
 
-const ProfileScreen = ({ navigation }) => {
+const SCREEN_WIDTH = Math.round(Dimensions.get('window').width);
+
+const ProfileScreen = () => {
+  // const { user } = useAuthContext();
+  function onPressEditPublicInfoHandler() {
+    // const user = { ...this.props.user };
+    // const highlightPhotos = [...this.props.highlightPhotos];
+    navigation.navigate('EditPublicInfo', {
+      // userInfo: user,
+      // highlightPhotos,
+    });
+  }
   return (
-    <View>
-      <Text>Profile Screen</Text>
-      <Button
-        onPress={() => {
-          navigation.navigate('Explore');
-        }}
+    <ScrollView bounces={false} style={styles.container}>
+      <View style={styles.infoWrapper}>
+        <View style={styles.avatarCoverWrapper}>
+          <TouchableOpacity activeOpacity={0.8}>
+            <Image
+              style={styles.cover}
+              source={{
+                uri: 'https://images.unsplash.com/photo-1674231262658-9a98bc841270?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw0Nnx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=60',
+              }}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.btnChangeCover}>
+            <FontAwesome5Icon size={18} name="camera" />
+          </TouchableOpacity>
+          <View style={styles.avatarWrapper}>
+            <TouchableOpacity activeOpacity={0.9}>
+              <Image
+                style={styles.avatar}
+                source={{
+                  uri: 'https://images.unsplash.com/photo-1510227272981-87123e259b17?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=3759e09a5b9fbe53088b23c615b6312e',
+                }}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              // onPress={this.onPressAvatarOptionsHandler}
+              style={styles.btnChangeAvatar}
+            >
+              <FontAwesome5Icon size={18} name="camera" />
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View style={styles.introWrapper}>
+          <Text style={styles.name}>Dao Van Luong</Text>
+          <Text style={styles.subName}>(Luongdao)</Text>
+          <Text style={styles.introTxt}>skmkmvdfkvnkdfvnfkdnvfdkjvnfdknvd</Text>
+          <View style={styles.introOptionsWrapper}>
+            <TouchableOpacity activeOpacity={0.8} style={styles.btnAddStory}>
+              <FontAwesome5Icon size={16} color="#fff" name="plus-circle" />
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: '500',
+                  color: '#fff',
+                  marginLeft: 5,
+                }}
+              >
+                Add to your story
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              // onPress={this.onPressProfileSettingHandler}
+              activeOpacity={0.8}
+              style={styles.btnOption}
+            >
+              <FontAwesome5Icon size={20} color="#000" name="ellipsis-h" />
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View style={styles.introListWrapper}>
+          <View style={styles.introLine}>
+            <FontAwesome5Icon
+              size={20}
+              color="#333"
+              style={styles.introIcon}
+              name="briefcase"
+            />
+            <Text style={styles.introLineText}>
+              Work at{' '}
+              <Text style={styles.introHightLight}>HUST University</Text>
+            </Text>
+          </View>
+          <View style={styles.introLine}>
+            <FontAwesome5Icon
+              size={20}
+              color="#333"
+              style={styles.introIcon}
+              name="home"
+            />
+            <Text style={styles.introLineText}>
+              Live in <Text style={styles.introHightLight}>Nghe An</Text>
+            </Text>
+          </View>
+          <View style={styles.introLine}>
+            <FontAwesome5Icon
+              size={20}
+              color="#333"
+              style={styles.introIcon}
+              name="map-marker-alt"
+            />
+            <Text style={styles.introLineText}>
+              From{' '}
+              <Text style={styles.introHightLight}>Yen Thanh, Nghe An</Text>
+            </Text>
+          </View>
+          <View style={styles.introLine}>
+            <FontAwesome5Icon
+              size={20}
+              color="#333"
+              style={styles.introIcon}
+              name="heart"
+            />
+            <Text style={styles.introLineText}>
+              Relationship{' '}
+              <Text style={styles.introHightLight}>User relationship</Text>
+            </Text>
+          </View>
+          <View style={styles.introLine}>
+            <FontAwesome5Icon
+              size={20}
+              color="#333"
+              style={styles.introIcon}
+              name="rss"
+            />
+            <Text style={styles.introLineText}>
+              Followed by <Text style={styles.introHightLight}>40 </Text>
+              followers
+            </Text>
+          </View>
+          <View style={styles.introLine}>
+            <FontAwesome5Icon
+              size={20}
+              color="#333"
+              style={styles.introIcon}
+              name="github"
+            />
+            <TouchableOpacity>
+              <Text style={styles.introLineText}>https://youtube.com</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.introLine}>
+            <FontAwesome5Icon
+              size={20}
+              color="#333"
+              style={styles.introIcon}
+              name="link"
+            />
+            <TouchableOpacity>
+              <Text style={styles.introLineText}>skcmkmcdkmcdkmckdmcdkmcd</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.introLine}>
+            <FontAwesome5Icon
+              size={20}
+              color="#333"
+              style={styles.introIcon}
+              name="ellipsis-h"
+            />
+            <TouchableOpacity>
+              <Text style={styles.introLineText}>
+                View more introductory information
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        <HightlightPhotos
+          photos={[
+            {
+              photo_url:
+                'https://images.unsplash.com/photo-1674231313303-ab9bd1196390?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw0OXx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=60',
+            },
+            {
+              photo_url:
+                'https://images.unsplash.com/photo-1674231313303-ab9bd1196390?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw0OXx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=60',
+            },
+            {
+              photo_url:
+                'https://images.unsplash.com/photo-1674231313303-ab9bd1196390?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw0OXx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=60',
+            },
+            {
+              photo_url:
+                'https://images.unsplash.com/photo-1674231313303-ab9bd1196390?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw0OXx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=60',
+            },
+            {
+              photo_url:
+                'https://images.unsplash.com/photo-1674231313303-ab9bd1196390?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw0OXx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=60',
+            },
+            {
+              photo_url:
+                'https://images.unsplash.com/photo-1674231313303-ab9bd1196390?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw0OXx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=60',
+            },
+          ]}
+        />
+        <View
+          style={{
+            paddingVertical: 20,
+            borderBottomWidth: 0.5,
+            borderBottomColor: '#ddd',
+          }}
+        >
+          <TouchableOpacity
+            onPress={onPressEditPublicInfoHandler}
+            activeOpacity={0.8}
+            style={styles.btnEditPublicDetail}
+          >
+            <Text style={{ color: '#318bfb', fontSize: 16, fontWeight: '500' }}>
+              Edit public info
+            </Text>
+          </TouchableOpacity>
+        </View>
+        <FriendsShowing
+          friends={[
+            {
+              name: 'Dao Cam Tu',
+              avatar_url: 'https://randomuser.me/api/portraits/women/79.jpg',
+            },
+          ]}
+        />
+      </View>
+      <View style={{ marginTop: 20 }}>
+        <ToolBar />
+      </View>
+      {/* <PostTool /> */}
+      <ScrollView
+        alignItems="center"
+        bounces={false}
+        horizontal={true}
+        showsHorizontalScrollIndicator={false}
+        style={styles.navigationsWrapper}
       >
-        Go to explore page
-      </Button>
-    </View>
+        <TouchableOpacity style={styles.navigation}>
+          <FontAwesome5Icon
+            style={styles.navigationIcon}
+            color="#000"
+            size={20}
+            name="images"
+          />
+          <Text style={{ fontSize: 16, fontWeight: '500' }}>Images</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.navigation}>
+          <FontAwesome5Icon
+            style={styles.navigationIcon}
+            color="#000"
+            size={20}
+            name="video"
+          />
+          <Text style={{ fontSize: 16, fontWeight: '500' }}>Videos</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.navigation}>
+          <FontAwesome5Icon
+            style={styles.navigationIcon}
+            color="#000"
+            size={20}
+            name="calendar-week"
+          />
+          <Text style={{ fontSize: 16, fontWeight: '500' }}>Life event</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{ ...styles.navigation, ...styles.lastNavigation }}
+        >
+          <FontAwesome5Icon
+            style={styles.navigationIcon}
+            color="#000"
+            size={20}
+            name="music"
+          />
+          <Text style={{ fontSize: 16, fontWeight: '500' }}>Music</Text>
+        </TouchableOpacity>
+      </ScrollView>
+      {/* <ProfilePosts
+        highLightPhotos={highlightPhotos}
+        profilePosts={profilePosts}
+      ></ProfilePosts> */}
+      {Array(6)
+        .fill(1)
+        .map((_, index) => (
+          <Post key={index} />
+        ))}
+    </ScrollView>
   );
 };
 
 export default ProfileScreen;
+
+const styles = StyleSheet.create({
+  container: {},
+  infoWrapper: {
+    padding: 15,
+    backgroundColor: '#fff',
+    borderBottomColor: '#ddd',
+    borderBottomWidth: 1,
+  },
+  avatarCoverWrapper: {
+    paddingBottom: 90,
+    position: 'relative',
+  },
+  cover: {
+    width: '100%',
+    height: 200,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+  },
+  avatarWrapper: {
+    backgroundColor: '#000',
+    position: 'absolute',
+    borderRadius: 2000,
+    left: (SCREEN_WIDTH - 30 - 180) / 2, //paddingHorizontal - avatarWidth
+    bottom: 0,
+  },
+  avatar: {
+    height: 180,
+    width: 180,
+    borderRadius: 2000,
+    borderColor: '#fff',
+    borderWidth: 5,
+  },
+  btnChangeCover: {
+    backgroundColor: '#fff',
+    position: 'absolute',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 2.5,
+    bottom: 90 + 10,
+    right: 10,
+  },
+  btnChangeAvatar: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    borderRadius: 50,
+    width: 45,
+    height: 45,
+    borderWidth: 2.5,
+    borderColor: '#fff',
+    backgroundColor: '#ddd',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  introWrapper: {
+    alignItems: 'center',
+    paddingVertical: 15,
+    borderBottomColor: '#ddd',
+    borderBottomWidth: 0.5,
+  },
+  name: {
+    fontSize: 24,
+    fontWeight: '500',
+  },
+  subName: {
+    fontSize: 20,
+    fontWeight: '500',
+  },
+  introTxt: {
+    color: 'rgba(0,0,0,0.7)',
+    marginTop: 10,
+  },
+  introOptionsWrapper: {
+    marginTop: 15,
+    flexDirection: 'row',
+  },
+  btnAddStory: {
+    backgroundColor: '#318bfb',
+    borderRadius: 5,
+    height: 40,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: SCREEN_WIDTH - 30 - 50 - 10, //paddingHorizontal optionBtnWidth, marginLeft
+  },
+  btnOption: {
+    marginLeft: 10,
+    borderRadius: 5,
+    height: 40,
+    width: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#ddd',
+  },
+  introListWrapper: {
+    paddingVertical: 10,
+  },
+  introLine: {
+    flexDirection: 'row',
+    height: 40,
+    alignItems: 'center',
+  },
+  introIcon: {
+    width: 30,
+  },
+  introLineText: {
+    fontSize: 16,
+    fontWeight: '400',
+  },
+  introHightLight: {
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  highlightPhotosWrapper: {
+    flexDirection: 'row',
+    borderRadius: 10,
+    flexWrap: 'wrap',
+    overflow: 'hidden',
+    justifyContent: 'space-between',
+  },
+  highLightPhoto: {},
+  photo: {
+    width: (SCREEN_WIDTH - 42) / 3,
+    height: (SCREEN_WIDTH - 42) / 3,
+  },
+  btnEditPublicDetail: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#9dd0eb',
+    width: '100%',
+    height: 40,
+    borderRadius: 5,
+  },
+  friendsWrapper: {
+    paddingVertical: 15,
+  },
+  friendsBar: {
+    borderRadius: 5,
+    paddingVertical: 10,
+    backgroundColor: '#fff',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  btnFindFriends: {
+    paddingHorizontal: 10,
+  },
+  friendGallery: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  friendItem: {
+    width: (SCREEN_WIDTH - 30 - 20) / 3,
+    marginBottom: 15,
+  },
+  friendAvatar: {
+    width: (SCREEN_WIDTH - 30 - 20) / 3,
+    height: (SCREEN_WIDTH - 30 - 20) / 3,
+    borderRadius: 10,
+    borderWidth: 0.2,
+    borderColor: '#333',
+  },
+  btnViewAllFriends: {
+    width: '100%',
+    borderRadius: 5,
+    height: 40,
+    backgroundColor: '#ddd',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  navigationsWrapper: {
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    marginTop: 15,
+    borderTopColor: '#ddd',
+    borderTopWidth: 1,
+    borderBottomColor: '#ddd',
+    borderBottomWidth: 1,
+    height: 100,
+    width: SCREEN_WIDTH,
+    paddingHorizontal: 10,
+  },
+  navigation: {
+    flexDirection: 'row',
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+    backgroundColor: '#ddd',
+    borderRadius: 48,
+    marginHorizontal: 5,
+  },
+  lastNavigation: {
+    marginRight: 25,
+  },
+  navigationIcon: {
+    width: 30,
+    alignItems: 'center',
+  },
+});
