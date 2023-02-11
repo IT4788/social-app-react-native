@@ -40,6 +40,10 @@ const AppBar = () => {
     navigation.navigate('MyPage');
   };
 
+  const onPressMessages = () => {
+    navigation.navigate('Messages');
+  };
+
   return (
     <Container>
       <Text>facebook</Text>
@@ -49,7 +53,7 @@ const AppBar = () => {
           {/* <Feather name="search" size={24} color="black" /> */}
         </Button>
 
-        <Button>
+        <Button onPress={onPressMessages}>
           <MaterialCommunityIcons name="facebook-messenger" size={24} />
         </Button>
 
