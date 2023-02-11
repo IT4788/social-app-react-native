@@ -7,3 +7,7 @@ export function getUserProfile(id) {
 export function updateProfileInfo(data) {
   return client.put('user', data);
 }
+
+export function changePassword(data) {
+  return client.patch('user/change_password', data);
+}

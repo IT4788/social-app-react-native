@@ -13,6 +13,7 @@ import FullFriendsScreen from '../pages/App/FullFriends';
 import NotificationScreen from '../pages/App/Notifications';
 import { TabNavigator } from './TabNavigator';
 import MyPageScreen from '../pages/App/MyPage';
+import ChangePasswordScreen from '../pages/App/ChangePassword';
 
 const RootStack = createNativeStackNavigator();
 
@@ -72,6 +73,11 @@ const AppStack = () => {
       <RootStack.Screen
         name="MyPage"
         component={MyPageScreen}
+        options={{ headerShown: false }}
+      />
+      <RootStack.Screen
+        name="ChangePassword"
+        component={ChangePasswordScreen}
         options={{ headerShown: false }}
       />
       <RootStack.Screen name="Explore" component={ExploreScreen} />

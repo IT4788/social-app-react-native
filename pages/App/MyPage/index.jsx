@@ -24,6 +24,10 @@ import { getUserAvatar } from '../../../utils/image';
 const MyPageScreen = () => {
   const { user, handleLogout } = useAuthContext();
 
+  const handleGoToChangePassword = () => {
+    navigation.push('ChangePassword');
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView bounces={false}>
@@ -130,13 +134,16 @@ const MyPageScreen = () => {
             <AppText style={styles.name}>Help & Support</AppText>
           </View>
         </ExTouchableOpacity>
-        <ExTouchableOpacity style={styles.btnOption}>
+        <ExTouchableOpacity
+          onPress={handleGoToChangePassword}
+          style={styles.btnOption}
+        >
           <Image
             style={styles.icon}
             source={require('../../../assets/icons/gear.png')}
           />
           <View>
-            <AppText style={styles.name}>Setting & Privacy</AppText>
+            <AppText style={styles.name}>Change Password</AppText>
           </View>
         </ExTouchableOpacity>
         <ExTouchableOpacity onPress={handleLogout} style={styles.btnOption}>
