@@ -1,12 +1,5 @@
 import React, { useState } from 'react';
-import {
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-  Image,
-  Platform,
-} from 'react-native';
+import { ScrollView, Text, TouchableOpacity, View, Image } from 'react-native';
 import styled from 'styled-components';
 import FAIcon from 'react-native-vector-icons/FontAwesome5';
 import MCIcon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -16,9 +9,11 @@ import AppColors from '../../../theme/AppColors';
 import { Avatar, Button, TextInput } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
 import { v4 as uuid } from 'uuid';
-import client from '../../../services/client';
 import { getUserAvatar } from '../../../utils/image';
 import { useAuthContext } from '../../../context/AuthContext';
+import useUpload from '../../../hooks/useUpload';
+import { useMutation } from '@tanstack/react-query';
+import { addPost } from '../../../services/post';
 
 const Container = styled.SafeAreaView`
   background-color: #fff;
@@ -128,21 +123,46 @@ const AddPostScreen = ({ navigation }) => {
   const [images, setImages] = useState([]);
 
   const { user } = useAuthContext();
+  const { handleOpenImageLib, handleUploadFile } = useUpload();
 
-  const handleSelectPhoto = async () => {
-    if (Platform.OS !== 'web') {
-      const { status } =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
+  // const handleSelectPhoto = async () => {
+  //   if (Platform.OS !== 'web') {
+  //     const { status } =
+  //       await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-      if (status !== 'granted') {
-        return alert(
-          'Sorry, we need camera roll permissions to make this work!',
-        );
-      }
-    }
+  //     if (status !== 'granted') {
+  //       return alert(
+  //         'Sorry, we need camera roll permissions to make this work!',
+  //       );
+  //     }
+  //   }
 
-    // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
+  //   // No permissions request is necessary for launching the image library
+  //   let result = await ImagePicker.launchImageLibraryAsync({
+  //     mediaTypes: ImagePicker.MediaTypeOptions.All,
+  //     // allowsEditing: true,
+  //     aspect: [4, 3],
+  //     quality: 1,
+  //     allowsMultipleSelection: true,
+  //     selectionLimit: MAX_IMAGE_ALLOWED - images.length,
+  //     orderedSelection: true,
+  //   });
+
+  //   console.log(result);
+
+  //   if (!result.cancelled) {
+  //     const imagesSelected = result.selected ? result.selected : [result];
+
+  //     if (images.length + imagesSelected.length <= MAX_IMAGE_ALLOWED) {
+  //       setImages((prev) => [...prev, ...imagesSelected]);
+  //     } else {
+  //       alert('Exceed max images to upload');
+  //     }
+  //   }
+  // };
+
+  const handleSelectPhotoNew = async () => {
+    const result = await handleOpenImageLib({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       // allowsEditing: true,
       aspect: [4, 3],
@@ -150,26 +170,48 @@ const AddPostScreen = ({ navigation }) => {
       allowsMultipleSelection: true,
       selectionLimit: MAX_IMAGE_ALLOWED - images.length,
       orderedSelection: true,
+      base64: true,
     });
 
-    console.log(result);
-
     if (!result.cancelled) {
+      console.log({ result });
       const imagesSelected = result.selected ? result.selected : [result];
 
       if (images.length + imagesSelected.length <= MAX_IMAGE_ALLOWED) {
-        setImages((prev) => [...prev, ...imagesSelected]);
+        console.log(images);
+        const urls = await Promise.all(
+          imagesSelected.map(async (image) => {
+            let base64Img = `data:image/jpg;base64,${image.base64}`;
+            const uploadRes = await handleUploadFile(base64Img);
+            return uploadRes;
+          }),
+        );
+
+        setImages((prev) => [
+          ...prev,
+          ...urls.map((u) => ({ uri: u, id: uuid() })),
+        ]);
       } else {
         alert('Exceed max images to upload');
       }
     }
   };
 
-  const handleSubmit = () => {
-    console.log({ text });
-    client.post('post', { describe: text }).then((res) => {
-      console.log(res);
+  const { mutate: addPostMutation } = useMutation(addPost, {
+    onSuccess() {
       navigation.push('Home');
+    },
+  });
+
+  const handleSubmit = () => {
+    if (!text || !images.length) {
+      alert('Please enter text or select images');
+      return;
+    }
+
+    addPostMutation('post', {
+      describe: text,
+      images: images.map((i) => i.uri),
     });
   };
 
@@ -227,7 +269,7 @@ const AddPostScreen = ({ navigation }) => {
 
             <Content.ImageContainer>
               {images.map((image) => (
-                <Content.ImageWrapper key={uuid()}>
+                <Content.ImageWrapper key={image.id}>
                   <Content.ImageItem source={{ uri: image.uri }} />
                 </Content.ImageWrapper>
               ))}
@@ -240,7 +282,7 @@ const AddPostScreen = ({ navigation }) => {
       <View style={{ height: 60, backgroundColor: '#fff' }}></View>
       <Footer>
         <Footer.Icons>
-          <TouchableOpacity onPress={handleSelectPhoto}>
+          <TouchableOpacity onPress={handleSelectPhotoNew}>
             <Ionicons color="green" size={24} name="md-images" />
           </TouchableOpacity>
           <TouchableOpacity>

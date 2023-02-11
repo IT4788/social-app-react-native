@@ -12,3 +12,8 @@ export const getCoverImage = (user) => {
   if (typeof user === 'string' && user) return user;
   return 'https://tokystorage.s3.amazonaws.com/images/default-cover.png';
 };
+
+export const convertToBase64 = (url) => {
+  let base64Img = `data:image/jpg;base64,${url}`;
+  return base64Img;
+};

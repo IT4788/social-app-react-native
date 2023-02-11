@@ -54,6 +54,7 @@ PUT {{baseUrl}}/user
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
+    # "cover_image": "dcdc"
 
 {
     "phone": "0358446198",
@@ -67,12 +68,20 @@ Authorization: Bearer {{authToken}}
     "city": "Ha Noi",
     "country": "Viet Nam"
     # "avatar": "cdcdc",
-    # "cover_image": "dcdc"
 }
 
 
 ### 6. Add post => add_post
+POST {{baseUrl}}/post
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
 
+{
+    "images": ["https://images.unsplash.com/photo-1675789652767-d3bc9f56abd7?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwyOHx8fGVufDB8fHx8&auto=format&fit=crop&w=2000&q=60","https://images.unsplash.com/photo-1675789652972-ee2040d2cc9a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwxNTJ8fHxlbnwwfHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=60"],
+    "describe": "This is my post Luong Dao",
+    "status": "hạnh phúc"
+}
 
 ### 7. Edit post => edit_post
 
