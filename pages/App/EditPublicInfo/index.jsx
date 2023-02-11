@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   View,
   ScrollView,
@@ -9,31 +9,119 @@ import {
 import ExTouchableOpacity from '../../../components/ExTouchableOpacity';
 import AppText from '../../../components/AppText';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
-import HightlightPhotos from '../../../components/HightlightPhotos';
+import { FontAwesome } from '@expo/vector-icons';
+// import HightlightPhotos from '../../../components/HightlightPhotos';
 import { SCREEN_HEIGHT, STATUSBAR_HEIGHT } from '../../../constants';
 import * as navigation from '../../../navigation/helpers';
+import AppInput from '../../../components/AppInput';
+import { Controller, useForm } from 'react-hook-form';
+import { useAuthContext } from '../../../context/AuthContext';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { getUserProfile, updateProfileInfo } from '../../../services/user';
+import { getCoverImage, getUserAvatar } from '../../../utils/image';
+import useUpload from '../../../hooks/useUpload';
+import { Ionicons } from '@expo/vector-icons';
+
+const defaultProfileValues = {
+  avatar: '',
+  cover_image: '',
+  username: '',
+  firstName: '',
+  lastName: '',
+  description: '',
+  current_address: '',
+  from_address: '',
+  worked_at: '',
+  studied_at: '',
+};
 
 const EditPublicInfo = () => {
-  const userInfo = {
-    avatar_url:
-      'https://images.unsplash.com/photo-1674413146454-41e62f015153?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw4MHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=60',
-    cover_url:
-      'https://images.unsplash.com/photo-1674413146454-41e62f015153?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw4MHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=60',
-    introTxt: 'sdkcmsdkcmdksmckdsmcds',
-    work_at: 'kdcndskcmdskmcdsc',
-    live_in: 'dskcdskcmdksmckdsmcksdmcs',
-    from: 'dkcndscskdmc',
-    relationship: 'dkcnsdkcndskjcnd',
-    follower: 40,
-    links: {
-      repl: 'skmcskmcskmcskmc',
-      github: 'https://youtube.com',
+  const { user: loggedInUser, refetchUser } = useAuthContext();
+  const id = loggedInUser?._id;
+  const scrollViewRef = useRef();
+  const { handleUploadFile, handleOpenImageLib } = useUpload();
+
+  const { data, refetch: fetchUser } = useQuery(
+    ['user', 'profile', id],
+    () => getUserProfile(id),
+    {
+      onSuccess(data) {
+        console.log(data);
+      },
+      select: (data) => data.data,
+      enabled: false,
     },
-  };
+  );
+  const user = data?.data;
 
   const onPressGoBackHandler = () => {
     navigation.goBack();
   };
+
+  const { control, setValue, watch, reset, getValues } = useForm({
+    defaultValues: defaultProfileValues,
+  });
+
+  useEffect(() => {
+    if (id) {
+      fetchUser();
+    }
+  }, [id]);
+
+  useEffect(() => {
+    if (!user) return;
+    console.log({ user });
+    reset({
+      avatar: user.avatar || '',
+      cover_image: user.cover_image || '',
+      username: user.username || '',
+      firstName: user.firstName || '',
+      lastName: user.lastName || '',
+      description: user.description || '',
+      current_address: user.current_address || '',
+      from_address: user.from_address || '',
+      worked_at: user.worked_at || '',
+      studied_at: user.studied_at || '',
+    });
+  }, [user]);
+
+  const avatar = watch('avatar');
+  const coverImage = watch('cover_image');
+
+  const { mutate } = useMutation(updateProfileInfo, {
+    onSuccess() {
+      refetchUser();
+      navigation.push('Profile');
+    },
+  });
+
+  const handleSaveProfileInfo = () => {
+    const data = getValues();
+
+    mutate(data);
+  };
+
+  async function handleSelectCoverImage() {
+    const result = await handleOpenImageLib();
+
+    if (result?.base64) {
+      let base64Img = `data:image/jpg;base64,${result.base64}`;
+      const uploadRes = await handleUploadFile(base64Img);
+
+      uploadRes && setValue('cover_image', uploadRes);
+    }
+  }
+
+  async function handleSelectAvatarImage() {
+    const result = await handleOpenImageLib();
+
+    if (result?.base64) {
+      let base64Img = `data:image/jpg;base64,${result.base64}`;
+      const uploadRes = await handleUploadFile(base64Img);
+
+      uploadRes && setValue('avatar', uploadRes);
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -46,19 +134,26 @@ const EditPublicInfo = () => {
         </ExTouchableOpacity>
         <AppText style={styles.navigationTitle}>Edit your profile</AppText>
       </View>
-      <ScrollView bounces={false} style={styles.detailsWrapper}>
+      <ScrollView
+        ref={scrollViewRef}
+        bounces={false}
+        style={styles.detailsWrapper}
+      >
         <View style={{ ...styles.detail, paddingTop: 0 }}>
           <View style={styles.detailTitleWrapper}>
             <AppText style={styles.detailTitle}>Avatar</AppText>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={handleSelectAvatarImage}>
               <AppText style={{ fontSize: 16, color: '#318bfb' }}>
                 Modify
               </AppText>
             </TouchableOpacity>
           </View>
-          <TouchableOpacity activeOpacity={0.8}>
+          <TouchableOpacity
+            onPress={handleSelectAvatarImage}
+            activeOpacity={0.8}
+          >
             <Image
-              source={{ uri: userInfo.avatar_url }}
+              source={{ uri: getUserAvatar(avatar) }}
               style={styles.avatar}
             ></Image>
           </TouchableOpacity>
@@ -66,15 +161,18 @@ const EditPublicInfo = () => {
         <View style={styles.detail}>
           <View style={styles.detailTitleWrapper}>
             <AppText style={styles.detailTitle}>Cover</AppText>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={handleSelectCoverImage}>
               <AppText style={{ fontSize: 16, color: '#318bfb' }}>
                 Modify
               </AppText>
             </TouchableOpacity>
           </View>
-          <TouchableOpacity activeOpacity={0.8}>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={handleSelectCoverImage}
+          >
             <Image
-              source={{ uri: userInfo.cover_url }}
+              source={{ uri: getCoverImage(coverImage) }}
               style={styles.cover}
             ></Image>
           </TouchableOpacity>
@@ -82,69 +180,155 @@ const EditPublicInfo = () => {
         <View style={styles.detail}>
           <View style={styles.detailTitleWrapper}>
             <AppText style={styles.detailTitle}>Introduction</AppText>
-            <TouchableOpacity>
-              <AppText style={{ fontSize: 16, color: '#318bfb' }}>
-                Modify
-              </AppText>
-            </TouchableOpacity>
           </View>
           <TouchableOpacity activeOpacity={0.8}>
-            <AppText style={styles.introTxt}>{userInfo.introTxt}</AppText>
+            {/* <AppText style={styles.introTxt}>{userInfo.introTxt}</AppText> */}
+            <Controller
+              control={control}
+              name="description"
+              render={({ field: { value, onChange } }) => (
+                <AppInput
+                  // left={<TextInput.Icon icon="lock-outline" />}
+                  placeholder="Your introduction"
+                  value={value}
+                  onChangeText={(text) => onChange({ target: { value: text } })}
+                />
+              )}
+            />
           </TouchableOpacity>
         </View>
         <View style={styles.detail}>
           <View style={styles.detailTitleWrapper}>
             <AppText style={styles.detailTitle}>Details</AppText>
-            <TouchableOpacity>
+            {/* <TouchableOpacity>
               <AppText style={{ fontSize: 16, color: '#318bfb' }}>
                 Modify
               </AppText>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
           <View style={styles.introListWrapper}>
             <View style={styles.introLine}>
-              <FontAwesome5Icon
-                size={20}
-                color="#333"
-                style={styles.introIcon}
-                name="briefcase"
+              <View style={{ flexDirection: 'row' }}>
+                <FontAwesome
+                  style={styles.introIcon}
+                  name="user"
+                  size={20}
+                  color="#333"
+                />
+                <AppText style={styles.introLineText}>Username </AppText>
+              </View>
+              <Controller
+                control={control}
+                name="username"
+                render={({ field: { value, onChange } }) => (
+                  <AppInput
+                    placeholder="Username"
+                    value={value}
+                    onChangeText={(text) =>
+                      onChange({ target: { value: text } })
+                    }
+                  />
+                )}
               />
-              <AppText style={styles.introLineText}>
-                Work at{' '}
-                <AppText style={styles.introHightLight}>
-                  {userInfo.work_at}
-                </AppText>
-              </AppText>
+            </View>
+
+            <View style={styles.introLine}>
+              <View style={{ flexDirection: 'row' }}>
+                <FontAwesome5Icon
+                  size={20}
+                  color="#333"
+                  style={styles.introIcon}
+                  name="briefcase"
+                />
+                <AppText style={styles.introLineText}>Work at </AppText>
+              </View>
+              <Controller
+                control={control}
+                name="worked_at"
+                render={({ field: { value, onChange } }) => (
+                  <AppInput
+                    placeholder="Work at"
+                    value={value}
+                    onChangeText={(text) =>
+                      onChange({ target: { value: text } })
+                    }
+                  />
+                )}
+              />
             </View>
             <View style={styles.introLine}>
-              <FontAwesome5Icon
-                size={20}
-                color="#333"
-                style={styles.introIcon}
-                name="home"
+              <View style={{ flexDirection: 'row' }}>
+                <Ionicons
+                  name="school"
+                  size={20}
+                  color="#333"
+                  style={styles.introIcon}
+                />
+                <AppText style={styles.introLineText}>Study at </AppText>
+              </View>
+              <Controller
+                control={control}
+                name="studied_at"
+                render={({ field: { value, onChange } }) => (
+                  <AppInput
+                    placeholder="Study at"
+                    value={value}
+                    onChangeText={(text) =>
+                      onChange({ target: { value: text } })
+                    }
+                  />
+                )}
               />
-              <AppText style={styles.introLineText}>
-                Live in{' '}
-                <AppText style={styles.introHightLight}>
-                  {userInfo.live_in}
-                </AppText>
-              </AppText>
             </View>
             <View style={styles.introLine}>
-              <FontAwesome5Icon
-                size={20}
-                color="#333"
-                style={styles.introIcon}
-                name="map-marker-alt"
+              <View style={{ flexDirection: 'row' }}>
+                <FontAwesome5Icon
+                  size={20}
+                  color="#333"
+                  style={styles.introIcon}
+                  name="home"
+                />
+                <AppText style={styles.introLineText}>Live in </AppText>
+              </View>
+              <Controller
+                control={control}
+                name="current_address"
+                render={({ field: { value, onChange } }) => (
+                  <AppInput
+                    placeholder="Live in"
+                    value={value}
+                    onChangeText={(text) =>
+                      onChange({ target: { value: text } })
+                    }
+                  />
+                )}
               />
-              <AppText style={styles.introLineText}>
-                From{' '}
-                <AppText style={styles.introHightLight}>
-                  {userInfo.from}
-                </AppText>
-              </AppText>
             </View>
             <View style={styles.introLine}>
+              <View style={{ flexDirection: 'row' }}>
+                <FontAwesome5Icon
+                  size={20}
+                  color="#333"
+                  style={styles.introIcon}
+                  name="map-marker-alt"
+                />
+                <AppText style={styles.introLineText}>From </AppText>
+              </View>
+              <Controller
+                control={control}
+                name="from_address"
+                render={({ field: { value, onChange } }) => (
+                  <AppInput
+                    placeholder="From"
+                    value={value}
+                    onChangeText={(text) =>
+                      onChange({ target: { value: text } })
+                    }
+                  />
+                )}
+              />
+            </View>
+            {/* <View style={styles.introLine}>
               <FontAwesome5Icon
                 size={20}
                 color="#333"
@@ -211,10 +395,10 @@ const EditPublicInfo = () => {
                   View more introductory information
                 </AppText>
               </TouchableOpacity>
-            </View>
+            </View> */}
           </View>
         </View>
-        <View style={styles.detail}>
+        {/* <View style={styles.detail}>
           <View style={styles.detailTitleWrapper}>
             <AppText style={styles.detailTitle}>Hobbies</AppText>
             <TouchableOpacity>
@@ -262,17 +446,20 @@ const EditPublicInfo = () => {
               ]}
             />
           </TouchableOpacity>
-        </View>
+        </View> */}
         <View
           activeOpacity={0.9}
           style={{ ...styles.detail, ...styles.lastDetail }}
         >
-          <TouchableOpacity style={styles.btnModifyMore}>
+          <TouchableOpacity
+            onPress={handleSaveProfileInfo}
+            style={styles.btnModifyMore}
+          >
             <FontAwesome5Icon />
             <AppText
               style={{ color: '#318bfb', fontSize: 16, fontWeight: '500' }}
             >
-              Modify introduction informations
+              Save Profile
             </AppText>
           </TouchableOpacity>
         </View>
@@ -314,6 +501,7 @@ const styles = StyleSheet.create({
   detailTitleWrapper: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginBottom: 20,
   },
   detailTitle: {
     fontSize: 20,
@@ -340,9 +528,10 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   introLine: {
-    flexDirection: 'row',
-    height: 40,
-    alignItems: 'center',
+    // flexDirection: 'row',
+    // height: 40,
+    // alignItems: 'center',
+    marginBottom: 20,
   },
   introIcon: {
     width: 30,

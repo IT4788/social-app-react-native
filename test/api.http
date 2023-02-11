@@ -56,7 +56,7 @@ Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
 {
-    "phone": "0123344445",
+    "phone": "0358446198",
     "username": "daovanluong123",
     "firstName": "dao",
     "lastName": "luong",
@@ -65,9 +65,9 @@ Authorization: Bearer {{authToken}}
     "description":"dcdcdc",
     "address": "hai ba trung",
     "city": "Ha Noi",
-    "country": "Viet Nam",
-    "avatar": "cdcdc",
-    "cover_image": "dcdc"
+    "country": "Viet Nam"
+    # "avatar": "cdcdc",
+    # "cover_image": "dcdc"
 }
 
 

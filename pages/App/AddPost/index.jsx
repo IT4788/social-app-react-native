@@ -124,6 +124,7 @@ const MAX_IMAGE_ALLOWED = 4;
 const AddPostScreen = ({ navigation }) => {
   const [text, setText] = useState('');
   const [images, setImages] = useState([]);
+
   const handleSelectPhoto = async () => {
     if (Platform.OS !== 'web') {
       const { status } =

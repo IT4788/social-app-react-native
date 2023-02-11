@@ -5,12 +5,21 @@ import { useContext } from 'react';
 import { createContext } from 'react';
 import client from '../services/client';
 import * as navigation from '../navigation/helpers';
+import { useQuery } from '@tanstack/react-query';
 
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isSplashLoading, setIsSplashLoading] = useState(false);
+
+  const { refetch } = useQuery(['loggedInUser'], () => client.get('user'), {
+    enabled: false,
+    onSuccess(data) {
+      setUser(data?.data?.user);
+    },
+    select: (data) => data.data,
+  });
 
   const getUserInfo = async () => {
     try {
@@ -46,7 +55,14 @@ const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, setUser, getUserInfo, isSplashLoading, handleLogout }}
+      value={{
+        user,
+        setUser,
+        getUserInfo,
+        isSplashLoading,
+        handleLogout,
+        refetchUser: refetch,
+      }}
     >
       {children}
     </AuthContext.Provider>

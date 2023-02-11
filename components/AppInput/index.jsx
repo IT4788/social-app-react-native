@@ -6,7 +6,7 @@ import AppFonts from '../../theme/AppFonts';
 const CustomInput = styled(TextInput)`
   background-color: #fff;
   font-family: ${AppFonts.FRegular};
-  height: 50px;
+  height: 40px;
 `;
 
 const AppInput = ({ ...props }) => {

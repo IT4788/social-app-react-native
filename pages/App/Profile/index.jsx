@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 // import { Button } from 'react-native-paper';
 import {
   Text,
@@ -11,16 +11,44 @@ import {
 } from 'react-native';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 // import { useAuthContext } from '../../../context/AuthContext';
-import HightlightPhotos from '../../../components/HightlightPhotos';
+// import HightlightPhotos from '../../../components/HightlightPhotos';
 import ToolBar from '../Home/components/ToolBar';
 import FriendsShowing from '../../../components/FriendShowing';
 import Post from '../../../components/Post';
 import * as navigation from '../../../navigation/helpers';
+import { useQuery } from '@tanstack/react-query';
+// import { useRoute } from '@react-navigation/native';
+import { getUserProfile, updateProfileInfo } from '../../../services/user';
+import { useAuthContext } from '../../../context/AuthContext';
+import { getCoverImage, getUserAvatar } from '../../../utils/image';
+import { Ionicons } from '@expo/vector-icons';
+import useUpload from '../../../hooks/useUpload';
 
 const SCREEN_WIDTH = Math.round(Dimensions.get('window').width);
 
 const ProfileScreen = () => {
-  // const { user } = useAuthContext();
+  const { user: loggedInUser, refetchUser } = useAuthContext();
+  const [coverImage, setCoverImage] = useState(null);
+  const [avatarImage, setAvatarImage] = useState(null);
+  const id = loggedInUser?._id;
+
+  const { handleUploadFile, handleOpenImageLib } = useUpload();
+  const { data } = useQuery(['user', 'profile', id], () => getUserProfile(id), {
+    onSuccess(data) {
+      console.log(data);
+    },
+    select: (data) => data.data,
+    enabled: !!id,
+  });
+  const user = data?.data;
+
+  useEffect(() => {
+    if (!user) return;
+
+    setAvatarImage(getUserAvatar(user));
+    setCoverImage(getCoverImage(user));
+  }, [user]);
+
   function onPressEditPublicInfoHandler() {
     // const user = { ...this.props.user };
     // const highlightPhotos = [...this.props.highlightPhotos];
@@ -29,6 +57,38 @@ const ProfileScreen = () => {
       // highlightPhotos,
     });
   }
+
+  async function handleUpdateProfile(data) {
+    await updateProfileInfo(data);
+    refetchUser();
+  }
+
+  async function handleSelectCoverImage() {
+    const result = await handleOpenImageLib();
+
+    if (result?.base64) {
+      let base64Img = `data:image/jpg;base64,${result.base64}`;
+      const uploadRes = await handleUploadFile(base64Img);
+      setCoverImage(uploadRes);
+
+      // call api to update user cover image
+      uploadRes && (await handleUpdateProfile({ cover_image: uploadRes }));
+    }
+  }
+
+  async function handleSelectAvatarImage() {
+    const result = await handleOpenImageLib();
+
+    if (result?.base64) {
+      let base64Img = `data:image/jpg;base64,${result.base64}`;
+      const uploadRes = await handleUploadFile(base64Img);
+      setAvatarImage(uploadRes);
+
+      // call api to update user avatar image
+      uploadRes && (await handleUpdateProfile({ avatar: uploadRes }));
+    }
+  }
+
   return (
     <ScrollView bounces={false} style={styles.container}>
       <View style={styles.infoWrapper}>
@@ -37,24 +97,30 @@ const ProfileScreen = () => {
             <Image
               style={styles.cover}
               source={{
-                uri: 'https://images.unsplash.com/photo-1674231262658-9a98bc841270?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw0Nnx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=60',
+                uri: coverImage,
               }}
             />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.btnChangeCover}>
+          <TouchableOpacity
+            style={styles.btnChangeCover}
+            onPress={handleSelectCoverImage}
+          >
             <FontAwesome5Icon size={18} name="camera" />
           </TouchableOpacity>
           <View style={styles.avatarWrapper}>
-            <TouchableOpacity activeOpacity={0.9}>
+            <TouchableOpacity
+              onPress={handleSelectAvatarImage}
+              activeOpacity={0.9}
+            >
               <Image
                 style={styles.avatar}
                 source={{
-                  uri: 'https://images.unsplash.com/photo-1510227272981-87123e259b17?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=3759e09a5b9fbe53088b23c615b6312e',
+                  uri: avatarImage,
                 }}
               />
             </TouchableOpacity>
             <TouchableOpacity
-              // onPress={this.onPressAvatarOptionsHandler}
+              onPress={handleSelectAvatarImage}
               style={styles.btnChangeAvatar}
             >
               <FontAwesome5Icon size={18} name="camera" />
@@ -62,9 +128,15 @@ const ProfileScreen = () => {
           </View>
         </View>
         <View style={styles.introWrapper}>
-          <Text style={styles.name}>Dao Van Luong</Text>
-          <Text style={styles.subName}>(Luongdao)</Text>
-          <Text style={styles.introTxt}>skmkmvdfkvnkdfvnfkdnvfdkjvnfdknvd</Text>
+          <Text style={styles.name}>{user?.username}</Text>
+          {user?.firstName && user?.lastName ? (
+            <Text style={styles.subName}>
+              ({user.lastName} {user.firstName})
+            </Text>
+          ) : null}
+          {user?.description && (
+            <Text style={styles.introTxt}>{user?.description} </Text>
+          )}
           <View style={styles.introOptionsWrapper}>
             <TouchableOpacity activeOpacity={0.8} style={styles.btnAddStory}>
               <FontAwesome5Icon size={16} color="#fff" name="plus-circle" />
@@ -89,41 +161,67 @@ const ProfileScreen = () => {
           </View>
         </View>
         <View style={styles.introListWrapper}>
-          <View style={styles.introLine}>
-            <FontAwesome5Icon
-              size={20}
-              color="#333"
-              style={styles.introIcon}
-              name="briefcase"
-            />
-            <Text style={styles.introLineText}>
-              Work at{' '}
-              <Text style={styles.introHightLight}>HUST University</Text>
-            </Text>
-          </View>
-          <View style={styles.introLine}>
-            <FontAwesome5Icon
-              size={20}
-              color="#333"
-              style={styles.introIcon}
-              name="home"
-            />
-            <Text style={styles.introLineText}>
-              Live in <Text style={styles.introHightLight}>Nghe An</Text>
-            </Text>
-          </View>
-          <View style={styles.introLine}>
-            <FontAwesome5Icon
-              size={20}
-              color="#333"
-              style={styles.introIcon}
-              name="map-marker-alt"
-            />
-            <Text style={styles.introLineText}>
-              From{' '}
-              <Text style={styles.introHightLight}>Yen Thanh, Nghe An</Text>
-            </Text>
-          </View>
+          {user?.worked_at && (
+            <View style={styles.introLine}>
+              <FontAwesome5Icon
+                size={20}
+                color="#333"
+                style={styles.introIcon}
+                name="briefcase"
+              />
+              <Text style={styles.introLineText}>
+                Work at{' '}
+                <Text style={styles.introHightLight}>{user?.worked_at}</Text>
+              </Text>
+            </View>
+          )}
+          {user?.studied_at && (
+            <View style={styles.introLine}>
+              <Ionicons
+                name="school"
+                size={20}
+                color="#333"
+                style={styles.introIcon}
+              />
+              <Text style={styles.introLineText}>
+                Study at{' '}
+                <Text style={styles.introHightLight}>{user?.studied_at}</Text>
+              </Text>
+            </View>
+          )}
+
+          {user?.current_address && (
+            <View style={styles.introLine}>
+              <FontAwesome5Icon
+                size={20}
+                color="#333"
+                style={styles.introIcon}
+                name="home"
+              />
+              <Text style={styles.introLineText}>
+                Live in{' '}
+                <Text style={styles.introHightLight}>
+                  {user?.current_address}
+                </Text>
+              </Text>
+            </View>
+          )}
+
+          {user?.from_address && (
+            <View style={styles.introLine}>
+              <FontAwesome5Icon
+                size={20}
+                color="#333"
+                style={styles.introIcon}
+                name="map-marker-alt"
+              />
+              <Text style={styles.introLineText}>
+                From{' '}
+                <Text style={styles.introHightLight}>{user?.from_address}</Text>
+              </Text>
+            </View>
+          )}
+          {/*
           <View style={styles.introLine}>
             <FontAwesome5Icon
               size={20}
@@ -182,9 +280,9 @@ const ProfileScreen = () => {
                 View more introductory information
               </Text>
             </TouchableOpacity>
-          </View>
+          </View> */}
         </View>
-        <HightlightPhotos
+        {/* <HightlightPhotos
           photos={[
             {
               photo_url:
@@ -211,7 +309,7 @@ const ProfileScreen = () => {
                 'https://images.unsplash.com/photo-1674231313303-ab9bd1196390?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw0OXx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=60',
             },
           ]}
-        />
+        /> */}
         <View
           style={{
             paddingVertical: 20,

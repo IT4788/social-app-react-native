@@ -15,4 +15,13 @@ client.interceptors.request.use(
   (error) => Promise.reject(error),
 );
 
+export const defaultClient = axios.create({
+  baseURL: '',
+  withCredentials: false,
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+  },
+});
+
 export default client;
