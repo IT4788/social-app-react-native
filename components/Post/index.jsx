@@ -91,7 +91,8 @@ const Post = () => {
   };
 
   const handleGoToProfile = () => {
-    navigation.navigate('ProfileX');
+    // tempory hard code
+    navigation.navigate('ProfileX', { id: '63e60d2193d45a34d1067546' });
   };
 
   return (

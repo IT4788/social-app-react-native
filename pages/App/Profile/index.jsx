@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 // import { Button } from 'react-native-paper';
 import {
-  Text,
   StyleSheet,
   View,
   Image,
@@ -23,6 +22,7 @@ import { useAuthContext } from '../../../context/AuthContext';
 import { getCoverImage, getUserAvatar } from '../../../utils/image';
 import { Ionicons } from '@expo/vector-icons';
 import useUpload from '../../../hooks/useUpload';
+import AppText from '../../../components/AppText';
 
 const SCREEN_WIDTH = Math.round(Dimensions.get('window').width);
 
@@ -128,19 +128,19 @@ const ProfileScreen = () => {
           </View>
         </View>
         <View style={styles.introWrapper}>
-          <Text style={styles.name}>{user?.username}</Text>
+          <AppText style={styles.name}>{user?.username}</AppText>
           {user?.firstName && user?.lastName ? (
-            <Text style={styles.subName}>
+            <AppText style={styles.subName}>
               ({user.lastName} {user.firstName})
-            </Text>
+            </AppText>
           ) : null}
           {user?.description && (
-            <Text style={styles.introTxt}>{user?.description} </Text>
+            <AppText style={styles.introTxt}>{user?.description} </AppText>
           )}
           <View style={styles.introOptionsWrapper}>
             <TouchableOpacity activeOpacity={0.8} style={styles.btnAddStory}>
               <FontAwesome5Icon size={16} color="#fff" name="plus-circle" />
-              <Text
+              <AppText
                 style={{
                   fontSize: 16,
                   fontWeight: '500',
@@ -149,7 +149,7 @@ const ProfileScreen = () => {
                 }}
               >
                 Add to your story
-              </Text>
+              </AppText>
             </TouchableOpacity>
             <TouchableOpacity
               // onPress={this.onPressProfileSettingHandler}
@@ -169,10 +169,12 @@ const ProfileScreen = () => {
                 style={styles.introIcon}
                 name="briefcase"
               />
-              <Text style={styles.introLineText}>
+              <AppText style={styles.introLineText}>
                 Work at{' '}
-                <Text style={styles.introHightLight}>{user?.worked_at}</Text>
-              </Text>
+                <AppText style={styles.introHightLight}>
+                  {user?.worked_at}
+                </AppText>
+              </AppText>
             </View>
           )}
           {user?.studied_at && (
@@ -183,10 +185,12 @@ const ProfileScreen = () => {
                 color="#333"
                 style={styles.introIcon}
               />
-              <Text style={styles.introLineText}>
+              <AppText style={styles.introLineText}>
                 Study at{' '}
-                <Text style={styles.introHightLight}>{user?.studied_at}</Text>
-              </Text>
+                <AppText style={styles.introHightLight}>
+                  {user?.studied_at}
+                </AppText>
+              </AppText>
             </View>
           )}
 
@@ -198,12 +202,12 @@ const ProfileScreen = () => {
                 style={styles.introIcon}
                 name="home"
               />
-              <Text style={styles.introLineText}>
+              <AppText style={styles.introLineText}>
                 Live in{' '}
-                <Text style={styles.introHightLight}>
+                <AppText style={styles.introHightLight}>
                   {user?.current_address}
-                </Text>
-              </Text>
+                </AppText>
+              </AppText>
             </View>
           )}
 
@@ -215,10 +219,12 @@ const ProfileScreen = () => {
                 style={styles.introIcon}
                 name="map-marker-alt"
               />
-              <Text style={styles.introLineText}>
+              <AppText style={styles.introLineText}>
                 From{' '}
-                <Text style={styles.introHightLight}>{user?.from_address}</Text>
-              </Text>
+                <AppText style={styles.introHightLight}>
+                  {user?.from_address}
+                </AppText>
+              </AppText>
             </View>
           )}
           {/*
@@ -322,9 +328,11 @@ const ProfileScreen = () => {
             activeOpacity={0.8}
             style={styles.btnEditPublicDetail}
           >
-            <Text style={{ color: '#318bfb', fontSize: 16, fontWeight: '500' }}>
+            <AppText
+              style={{ color: '#318bfb', fontSize: 16, fontWeight: '500' }}
+            >
               Edit public info
-            </Text>
+            </AppText>
           </TouchableOpacity>
         </View>
         <FriendsShowing
@@ -354,7 +362,7 @@ const ProfileScreen = () => {
             size={20}
             name="images"
           />
-          <Text style={{ fontSize: 16, fontWeight: '500' }}>Images</Text>
+          <AppText style={{ fontSize: 16, fontWeight: '500' }}>Images</AppText>
         </TouchableOpacity>
         <TouchableOpacity style={styles.navigation}>
           <FontAwesome5Icon
@@ -363,7 +371,7 @@ const ProfileScreen = () => {
             size={20}
             name="video"
           />
-          <Text style={{ fontSize: 16, fontWeight: '500' }}>Videos</Text>
+          <AppText style={{ fontSize: 16, fontWeight: '500' }}>Videos</AppText>
         </TouchableOpacity>
         <TouchableOpacity style={styles.navigation}>
           <FontAwesome5Icon
@@ -372,7 +380,9 @@ const ProfileScreen = () => {
             size={20}
             name="calendar-week"
           />
-          <Text style={{ fontSize: 16, fontWeight: '500' }}>Life event</Text>
+          <AppText style={{ fontSize: 16, fontWeight: '500' }}>
+            Life event
+          </AppText>
         </TouchableOpacity>
         <TouchableOpacity
           style={{ ...styles.navigation, ...styles.lastNavigation }}
@@ -383,7 +393,7 @@ const ProfileScreen = () => {
             size={20}
             name="music"
           />
-          <Text style={{ fontSize: 16, fontWeight: '500' }}>Music</Text>
+          <AppText style={{ fontSize: 16, fontWeight: '500' }}>Music</AppText>
         </TouchableOpacity>
       </ScrollView>
       {/* <ProfilePosts

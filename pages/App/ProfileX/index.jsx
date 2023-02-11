@@ -15,12 +15,95 @@ import {
 } from '../../../constants';
 import Post from '../../../components/Post';
 import FriendsShowing from '../../../components/FriendShowing';
-import HightlightPhotos from '../../../components/HightlightPhotos';
+// import HightlightPhotos from '../../../components/HightlightPhotos';
 import ToolBar from '../Home/components/ToolBar';
 import AppText from '../../../components/AppText';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { useQuery } from '@tanstack/react-query';
+import { getUserProfile } from '../../../services/user';
+import { Ionicons } from '@expo/vector-icons';
 
 const ProfileXScreen = () => {
-  const isFriend = true;
+  // const isFriend = true;
+  const navigation = useNavigation();
+  const route = useRoute();
+
+  const id = route.params?.id;
+
+  function onPressGoBackHandler() {
+    navigation.goBack();
+  }
+
+  const { data } = useQuery(['user', 'profile', id], () => getUserProfile(id), {
+    onSuccess(data) {
+      console.log(data);
+    },
+    select: (data) => data.data,
+    enabled: !!id,
+  });
+  const user = data?.data;
+
+  const renderButton = () => {
+    switch (user?.friend_status) {
+      case 'approved':
+        return (
+          <TouchableOpacity activeOpacity={0.8} style={styles.btnAddStory}>
+            <FontAwesome5Icon
+              size={20}
+              color="#fff"
+              name={'facebook-messenger'}
+            />
+            <AppText
+              style={{
+                fontSize: 16,
+                fontWeight: '500',
+                color: '#fff',
+                marginLeft: 5,
+              }}
+            >
+              {'Send message'}
+            </AppText>
+          </TouchableOpacity>
+        );
+      case 'pending':
+        return (
+          <TouchableOpacity activeOpacity={0.8} style={styles.btnAddStory}>
+            {/* <FontAwesome5Icon
+            size={20}
+            color="#fff"
+            name={'facebook-messenger'}
+          /> */}
+            <AppText
+              style={{
+                fontSize: 16,
+                fontWeight: '500',
+                color: '#fff',
+                marginLeft: 5,
+              }}
+            >
+              {'Remove request'}
+            </AppText>
+          </TouchableOpacity>
+        );
+
+      default:
+        return (
+          <TouchableOpacity activeOpacity={0.8} style={styles.btnAddStory}>
+            <FontAwesome5Icon size={20} color="#fff" name={'user-plus'} />
+            <AppText
+              style={{
+                fontSize: 16,
+                fontWeight: '500',
+                color: '#fff',
+                marginLeft: 5,
+              }}
+            >
+              {'Friend request'}
+            </AppText>
+          </TouchableOpacity>
+        );
+    }
+  };
 
   return (
     <View style={styles.superContainer}>
@@ -56,7 +139,9 @@ const ProfileXScreen = () => {
               <Image
                 style={styles.cover}
                 source={{
-                  uri: 'https://images.unsplash.com/photo-1674423094915-2546893e2636?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw3NHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=60',
+                  uri:
+                    user?.cover_image ??
+                    'https://tokystorage.s3.amazonaws.com/images/default-cover.png',
                 }}
               />
             </TouchableOpacity>
@@ -65,154 +150,107 @@ const ProfileXScreen = () => {
                 <Image
                   style={styles.avatar}
                   source={{
-                    uri: 'https://images.unsplash.com/photo-1674423094915-2546893e2636?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw3NHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=60',
+                    uri:
+                      user?.avatar ??
+                      'https://www.pngitem.com/pimgs/m/150-1503945_transparent-user-png-default-user-image-png-png.png',
                   }}
                 />
               </TouchableOpacity>
             </View>
           </View>
           <View style={styles.introWrapper}>
-            <AppText style={styles.name}>Dao Van Luong</AppText>
-            <AppText style={styles.subName}>(luongdao)</AppText>
-            <AppText style={styles.introTxt}>
-              skcnskcndkcdkmcdkmckdmcdkmc
-            </AppText>
+            <AppText style={styles.name}>{user?.username}</AppText>
+            {user?.firstName && user?.lastName ? (
+              <AppText style={styles.subName}>
+                ({user.lastName} {user.firstName})
+              </AppText>
+            ) : null}
+            {user?.description && (
+              <AppText style={styles.introTxt}>{user?.description} </AppText>
+            )}
             <View style={styles.introOptionsWrapper}>
-              <TouchableOpacity activeOpacity={0.8} style={styles.btnAddStory}>
-                <FontAwesome5Icon
-                  size={20}
-                  color="#fff"
-                  name={isFriend ? 'facebook-messenger' : 'user-plus'}
-                />
-                <AppText
-                  style={{
-                    fontSize: 16,
-                    fontWeight: '500',
-                    color: '#fff',
-                    marginLeft: 5,
-                  }}
-                >
-                  {isFriend ? 'Send message' : 'Friend request'}
-                </AppText>
-              </TouchableOpacity>
-              <TouchableOpacity activeOpacity={0.8} style={styles.btnOption}>
+              {renderButton()}
+              {/* <TouchableOpacity activeOpacity={0.8} style={styles.btnOption}>
                 <FontAwesome5Icon
                   size={20}
                   color="#000"
                   name={isFriend ? 'user-check' : 'facebook-messenger'}
                 />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
               <TouchableOpacity activeOpacity={0.8} style={styles.btnOption}>
                 <FontAwesome5Icon size={20} color="#000" name="ellipsis-h" />
               </TouchableOpacity>
             </View>
           </View>
           <View style={styles.introListWrapper}>
-            <View style={styles.introLine}>
-              <FontAwesome5Icon
-                size={20}
-                color="#333"
-                style={styles.introIcon}
-                name="briefcase"
-              />
-              <AppText style={styles.introLineText}>
-                Work at{' '}
-                <AppText style={styles.introHightLight}>
-                  Hust University
-                </AppText>
-              </AppText>
-            </View>
-            <View style={styles.introLine}>
-              <FontAwesome5Icon
-                size={20}
-                color="#333"
-                style={styles.introIcon}
-                name="home"
-              />
-              <AppText style={styles.introLineText}>
-                Live in{' '}
-                <AppText style={styles.introHightLight}>Nghe An</AppText>
-              </AppText>
-            </View>
-            <View style={styles.introLine}>
-              <FontAwesome5Icon
-                size={20}
-                color="#333"
-                style={styles.introIcon}
-                name="map-marker-alt"
-              />
-              <AppText style={styles.introLineText}>
-                From <AppText style={styles.introHightLight}>Nghe An</AppText>
-              </AppText>
-            </View>
-            <View style={styles.introLine}>
-              <FontAwesome5Icon
-                size={20}
-                color="#333"
-                style={styles.introIcon}
-                name="heart"
-              />
-              <AppText style={styles.introLineText}>
-                Relationship{' '}
-                <AppText style={styles.introHightLight}>
-                  User Relationship
-                </AppText>
-              </AppText>
-            </View>
-            <View style={styles.introLine}>
-              <FontAwesome5Icon
-                size={20}
-                color="#333"
-                style={styles.introIcon}
-                name="rss"
-              />
-              <AppText style={styles.introLineText}>
-                Followed by{' '}
-                <AppText style={styles.introHightLight}>40 </AppText>
-                followers
-              </AppText>
-            </View>
-            <View style={styles.introLine}>
-              <FontAwesome5Icon
-                size={20}
-                color="#333"
-                style={styles.introIcon}
-                name="github"
-              />
-              <TouchableOpacity>
+            {user?.worked_at && (
+              <View style={styles.introLine}>
+                <FontAwesome5Icon
+                  size={20}
+                  color="#333"
+                  style={styles.introIcon}
+                  name="briefcase"
+                />
                 <AppText style={styles.introLineText}>
-                  https://youtube.com
+                  Work at{' '}
+                  <AppText style={styles.introHightLight}>
+                    {user?.worked_at}
+                  </AppText>
                 </AppText>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.introLine}>
-              <FontAwesome5Icon
-                size={20}
-                color="#333"
-                style={styles.introIcon}
-                name="link"
-              />
-              <TouchableOpacity>
+              </View>
+            )}
+            {user?.studied_at && (
+              <View style={styles.introLine}>
+                <Ionicons
+                  name="school"
+                  size={20}
+                  color="#333"
+                  style={styles.introIcon}
+                />
                 <AppText style={styles.introLineText}>
-                  kncdkdkmclksnvkjsjaskcmd
+                  Study at{' '}
+                  <AppText style={styles.introHightLight}>
+                    {user?.studied_at}
+                  </AppText>
                 </AppText>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.introLine}>
-              <FontAwesome5Icon
-                size={20}
-                color="#333"
-                style={styles.introIcon}
-                name="ellipsis-h"
-              />
-              <TouchableOpacity>
+              </View>
+            )}
+
+            {user?.current_address && (
+              <View style={styles.introLine}>
+                <FontAwesome5Icon
+                  size={20}
+                  color="#333"
+                  style={styles.introIcon}
+                  name="home"
+                />
                 <AppText style={styles.introLineText}>
-                  View more introductory information
+                  Live in{' '}
+                  <AppText style={styles.introHightLight}>
+                    {user?.current_address}
+                  </AppText>
                 </AppText>
-              </TouchableOpacity>
-            </View>
+              </View>
+            )}
+
+            {user?.from_address && (
+              <View style={styles.introLine}>
+                <FontAwesome5Icon
+                  size={20}
+                  color="#333"
+                  style={styles.introIcon}
+                  name="map-marker-alt"
+                />
+                <AppText style={styles.introLineText}>
+                  From{' '}
+                  <AppText style={styles.introHightLight}>
+                    {user?.from_address}
+                  </AppText>
+                </AppText>
+              </View>
+            )}
           </View>
-          <HightlightPhotos
+          {/* <HightlightPhotos
             photos={[
               {
                 photo_url:
@@ -239,9 +277,9 @@ const ProfileXScreen = () => {
                   'https://images.unsplash.com/photo-1674231313303-ab9bd1196390?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw0OXx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=60',
               },
             ]}
-          />
+          /> */}
           <View
-            style={{ borderBottomWidth: 0.5, borderBottomColor: '#ddd' }}
+          // style={{ borderBottomWidth: 0.5, borderBottomColor: '#ddd' }}
           ></View>
           <FriendsShowing
             friends={[
@@ -322,7 +360,7 @@ export default ProfileXScreen;
 const styles = StyleSheet.create({
   superContainer: {},
   navigationBar: {
-    height: 94,
+    height: 80,
     paddingTop: STATUSBAR_HEIGHT,
     backgroundColor: '#fff',
     flexDirection: 'row',
