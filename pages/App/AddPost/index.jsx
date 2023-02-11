@@ -17,6 +17,8 @@ import { Avatar, Button, TextInput } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
 import { v4 as uuid } from 'uuid';
 import client from '../../../services/client';
+import { getUserAvatar } from '../../../utils/image';
+import { useAuthContext } from '../../../context/AuthContext';
 
 const Container = styled.SafeAreaView`
   background-color: #fff;
@@ -125,6 +127,8 @@ const AddPostScreen = ({ navigation }) => {
   const [text, setText] = useState('');
   const [images, setImages] = useState([]);
 
+  const { user } = useAuthContext();
+
   const handleSelectPhoto = async () => {
     if (Platform.OS !== 'web') {
       const { status } =
@@ -191,12 +195,9 @@ const AddPostScreen = ({ navigation }) => {
         </Header>
 
         <UserInfo>
-          <Avatar.Image
-            source={require('../../../assets/images/user1.jpg')}
-            size={48}
-          />
+          <Avatar.Image source={{ uri: getUserAvatar(user) }} size={48} />
           <View style={{ marginLeft: 12 }}>
-            <UserInfo.Title>Lương Đào</UserInfo.Title>
+            <UserInfo.Title>{user?.username}</UserInfo.Title>
             <UserInfo.BtnGroup>
               <UserInfo.BtnItem>
                 <FAIcon name="lock" color="rgba(0,0,0,0.65)" />

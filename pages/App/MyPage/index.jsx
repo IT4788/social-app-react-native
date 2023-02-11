@@ -46,7 +46,7 @@ const MyPageScreen = () => {
             <AppText style={{ color: '#333' }}>View your profile page</AppText>
           </View>
         </ExTouchableOpacity>
-        <ExTouchableOpacity
+        {/* <ExTouchableOpacity
           // onPress={this.onPressWatchVideoHandler}
           style={styles.btnOption}
         >
@@ -58,8 +58,8 @@ const MyPageScreen = () => {
             <AppText style={styles.name}>Video on facebook</AppText>
             <AppText style={{ color: '#333' }}>X+ new videos</AppText>
           </View>
-        </ExTouchableOpacity>
-        <ExTouchableOpacity style={styles.btnOption}>
+        </ExTouchableOpacity> */}
+        {/* <ExTouchableOpacity style={styles.btnOption}>
           <Image
             style={styles.icon}
             source={require('../../../assets/icons/bookmark.png')}
@@ -67,8 +67,8 @@ const MyPageScreen = () => {
           <View>
             <AppText style={styles.name}>Saved</AppText>
           </View>
-        </ExTouchableOpacity>
-        <ExTouchableOpacity style={styles.btnOption}>
+        </ExTouchableOpacity> */}
+        {/* <ExTouchableOpacity style={styles.btnOption}>
           <Image
             style={styles.icon}
             source={require('../../../assets/icons/live-news.png')}
@@ -76,9 +76,9 @@ const MyPageScreen = () => {
           <View>
             <AppText style={styles.name}>Live video</AppText>
           </View>
-        </ExTouchableOpacity>
+        </ExTouchableOpacity> */}
         <ExTouchableOpacity
-          // onPress={this.onPressFullFriendsHandler.bind(this)}
+          onPress={() => navigation.push('FullFriends')}
           style={styles.btnOption}
         >
           <Image
@@ -87,9 +87,24 @@ const MyPageScreen = () => {
           />
           <View>
             <AppText style={styles.name}>Friends</AppText>
+            {/* Danh sách bạn bè */}
           </View>
         </ExTouchableOpacity>
         <ExTouchableOpacity
+          // onPress={() => navigation.push('FullFriends')}
+          style={styles.btnOption}
+        >
+          <Image
+            style={styles.icon}
+            source={require('../../../assets/icons/friendship.png')}
+          />
+          <View>
+            <AppText style={styles.name}>Requested Friends</AppText>
+            {/* Lời mời kết bạn */}
+          </View>
+        </ExTouchableOpacity>
+
+        {/* <ExTouchableOpacity
           // onPress={this.onPressGroupsHandler}
           style={styles.btnOption}
         >
@@ -100,8 +115,8 @@ const MyPageScreen = () => {
           <View>
             <AppText style={styles.name}>Groups</AppText>
           </View>
-        </ExTouchableOpacity>
-        <ExTouchableOpacity
+        </ExTouchableOpacity> */}
+        {/* <ExTouchableOpacity
           // onPress={this.onPressMarketplaceHandler}
           style={styles.btnOption}
         >
@@ -112,7 +127,7 @@ const MyPageScreen = () => {
           <View>
             <AppText style={styles.name}>Marketplace</AppText>
           </View>
-        </ExTouchableOpacity>
+        </ExTouchableOpacity> */}
         <ExTouchableOpacity
           // onPress={this.onpressFriendAroundHandler}
           style={styles.btnOption}
@@ -123,9 +138,10 @@ const MyPageScreen = () => {
           />
           <View>
             <AppText style={styles.name}>Friends around here</AppText>
+            {/* Danh sách bạn bè gợi ý */}
           </View>
         </ExTouchableOpacity>
-        <ExTouchableOpacity style={styles.btnOption}>
+        {/* <ExTouchableOpacity style={styles.btnOption}>
           <Image
             style={styles.icon}
             source={require('../../../assets/icons/question-mark.png')}
@@ -133,7 +149,7 @@ const MyPageScreen = () => {
           <View>
             <AppText style={styles.name}>Help & Support</AppText>
           </View>
-        </ExTouchableOpacity>
+        </ExTouchableOpacity> */}
         <ExTouchableOpacity
           onPress={handleGoToChangePassword}
           style={styles.btnOption}

@@ -41,7 +41,7 @@ const AppBar = () => {
   };
 
   const onPressMessages = () => {
-    navigation.navigate('Messages');
+    navigation.navigate('Conversations');
   };
 
   return (

@@ -15,6 +15,7 @@ import { TabNavigator } from './TabNavigator';
 import MyPageScreen from '../pages/App/MyPage';
 import ChangePasswordScreen from '../pages/App/ChangePassword';
 import MessagesScreen from '../pages/App/Messages';
+import ConversationsScreen from '../pages/App/Conversations';
 
 const RootStack = createNativeStackNavigator();
 
@@ -84,6 +85,11 @@ const AppStack = () => {
       <RootStack.Screen
         name="Messages"
         component={MessagesScreen}
+        options={{ headerShown: false }}
+      />
+      <RootStack.Screen
+        name="Conversations"
+        component={ConversationsScreen}
         options={{ headerShown: false }}
       />
       <RootStack.Screen name="Explore" component={ExploreScreen} />

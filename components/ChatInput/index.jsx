@@ -77,20 +77,20 @@ const ChatInput = ({ reply, closeReply, isLeft, username }) => {
             value={message}
             onChangeText={(text) => setMessage(text)}
           />
-          <TouchableOpacity style={styles.rightIconButtonStyle}>
+          {/* <TouchableOpacity style={styles.rightIconButtonStyle}>
             <Icon name="paperclip" size={23} color="#9f9f9f" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.rightIconButtonStyle}>
             <Icon name="camera" size={23} color="#9f9f9f" />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
-        <TouchableOpacity style={styles.sendButton}>
+        {/* <TouchableOpacity style={styles.sendButton}>
           <Icon
             name={message ? 'send' : 'microphone'}
             size={23}
             color={'#fff'}
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
       {/* <EmojiPicker /> */}
     </Animated.View>
