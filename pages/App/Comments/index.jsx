@@ -6,16 +6,21 @@ import {
   TouchableOpacity,
   Dimensions,
   FlatList,
+  Image,
   // TouchableWithoutFeedback,
   // KeyboardAvoidingView,
 } from 'react-native';
 import * as navigation from '../../../navigation/helpers';
+import { AntDesign } from '@expo/vector-icons';
+
+import { FontAwesome } from '@expo/vector-icons';
 
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import Comment from '../../../components/Comment';
 import { useRoute } from '@react-navigation/native';
-import { getPostComments } from '../../../services/comment';
+import { createPostComment, getPostComments } from '../../../services/comment';
 import AppText from '../../../components/AppText';
+import useUpload from '../../../hooks/useUpload';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -26,6 +31,10 @@ const CommentsScreen = () => {
   const [postComments, setPostComments] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
+
+  const [text, setText] = useState('');
+  const [image, setImage] = useState(null);
+  const { handleUploadFile, handleOpenImageLib } = useUpload();
 
   function onPressBackDropHandler() {
     navigation.goBack();
@@ -62,6 +71,40 @@ const CommentsScreen = () => {
 
   console.log({ postComments });
 
+  const handleSendComment = () => {
+    if (!image && !text.trim()) {
+      return;
+    }
+
+    const data = { postId: id };
+    if (text.trim()) {
+      data.describe = text.trim();
+    }
+
+    if (image) {
+      data.images = [image];
+    }
+
+    createPostComment(data)
+      .then((commentData) => {
+        setPostComments((prev) => [commentData.data.data.comment, ...prev]);
+        setImage(null);
+        setText('');
+      })
+      .catch(console.log);
+  };
+
+  async function handleSelectAImage() {
+    const result = await handleOpenImageLib();
+
+    if (result?.base64) {
+      let base64Img = `data:image/jpg;base64,${result.base64}`;
+      const uploadRes = await handleUploadFile(base64Img);
+
+      uploadRes && setImage(uploadRes);
+    }
+  }
+
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.navigationStackBar}>
@@ -86,24 +129,59 @@ const CommentsScreen = () => {
       />
 
       <View style={styles.commentInputWrapper}>
-        <TouchableOpacity style={styles.cameraIconWrapper}>
+        <TouchableOpacity
+          onPress={handleSelectAImage}
+          style={styles.cameraIconWrapper}
+        >
           <FontAwesome5Icon name="camera" size={20}></FontAwesome5Icon>
         </TouchableOpacity>
         <View style={styles.textInputWrapper}>
-          <TextInput autoFocus={true} style={styles.textInput}></TextInput>
+          <TextInput
+            value={text}
+            onChangeText={(text) => setText(text)}
+            autoFocus={true}
+            style={styles.textInput}
+          ></TextInput>
         </View>
         <View style={styles.iconWrapper}>
-          <TouchableOpacity style={styles.iconItem}>
-            <FontAwesome5Icon
-              name="grip-horizontal"
-              size={20}
-            ></FontAwesome5Icon>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.iconItem}>
-            <FontAwesome5Icon name="grin-wink" size={20}></FontAwesome5Icon>
+          <TouchableOpacity style={styles.iconItem} onPress={handleSendComment}>
+            <FontAwesome name="send" size={20}></FontAwesome>
           </TouchableOpacity>
         </View>
       </View>
+      {image ? (
+        <View>
+          <Image
+            style={{
+              width: 50,
+              height: 50,
+              position: 'absolute',
+              bottom: 60,
+              borderRadius: 6,
+              left: 10,
+            }}
+            source={{
+              uri: image,
+            }}
+          />
+          <TouchableOpacity
+            onPress={() => {
+              setImage(null);
+            }}
+          >
+            <AntDesign
+              style={{
+                position: 'absolute',
+                bottom: 100,
+                left: 60,
+              }}
+              name="close"
+              size={20}
+              color="black"
+            />
+          </TouchableOpacity>
+        </View>
+      ) : null}
     </View>
   );
 };
@@ -154,10 +232,12 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     width: screenWidth - 40 - 80 - 30 - 10, //camera:40,padding:30,2 icon: 80,margin:10
     borderRightWidth: 0,
+    flex: 1,
   },
   textInput: {
     width: '100%',
     height: 40,
+    flex: 1,
     paddingHorizontal: 15,
     alignItems: 'center',
   },

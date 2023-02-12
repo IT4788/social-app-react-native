@@ -133,7 +133,7 @@ Authorization: Bearer {{authToken}}
 
 {
    "postId": "63e8afc23cf21face8bf9680",
-   "describe": "comment 12"
+   "describe": "comment 14"
 }
 
 ### 12. Get user friends => get_user_friends
