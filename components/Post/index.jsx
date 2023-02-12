@@ -93,7 +93,11 @@ dayjs.extend(relativeTime);
 
 const Post = ({ post }) => {
   const handleShowPostDetail = () => {
-    navigation.push('PostDetail');
+    if (post?.images.length) {
+      navigation.push('PostDetail', { id: post._id });
+    } else {
+      navigation.push('Comments', { id: post._id });
+    }
   };
   const { user } = useAuthContext();
 
@@ -109,7 +113,7 @@ const Post = ({ post }) => {
   };
 
   const handleClickComment = () => {
-    navigation.push('Comments', { post });
+    navigation.push('Comments', { id: post._id });
   };
 
   const [likeCnt, setLikeCnt] = useState(post?.line_cnt);

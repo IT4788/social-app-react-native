@@ -11,3 +11,5 @@ export const getUserPosts = (userId, config = {}) => {
 export const getNewFeeds = (config) => {
   return client.get('newfeeds/new', { params: config });
 };
+
+export const getPostDetail = (postId) => client.get(`post/${postId}`);

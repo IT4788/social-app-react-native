@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Text,
   StyleSheet,
@@ -18,6 +18,13 @@ import * as navigation from '../../../navigation/helpers';
 //   FetchPostDetailRequest,
 // } from '../actions/postDetailActions';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { useRoute } from '@react-navigation/native';
+import { getPostDetail } from '../../../services/post';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import { createReaction } from '../../../services/reaction';
+
 // import * as navigation from '../rootNavigation';
 // class PostDetailModal extends Component {
 //   constructor(props) {
@@ -91,35 +98,7 @@ import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 //   };
 // };
 
-const mockComments = [
-  {
-    id: '1',
-    avatar_url: 'https://randomuser.me/api/portraits/women/79.jpg',
-    name: 'Dao Van Luong',
-    content: 'This is a comment',
-    create_at: '2020-01-01',
-    // image:
-    //   'https://images.unsplash.com/photo-1674295648825-d64bfe010568?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzMHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=60',
-  },
-  {
-    id: '2',
-    avatar_url: 'https://randomuser.me/api/portraits/women/79.jpg',
-    name: 'Dao Van Luong',
-    content: 'This is a comment',
-    create_at: '2020-01-01',
-    image:
-      'https://images.unsplash.com/photo-1674295648825-d64bfe010568?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzMHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=60',
-  },
-  {
-    id: '3',
-    avatar_url: 'https://randomuser.me/api/portraits/women/79.jpg',
-    name: 'Dao Van Luong',
-    content: 'This is a comment',
-    create_at: '2020-01-01',
-    image:
-      'https://images.unsplash.com/photo-1674295648825-d64bfe010568?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzMHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=60',
-  },
-];
+dayjs.extend(relativeTime);
 
 const PostDetailScreen = () => {
   const [detailDisplay, setDetailDisplay] = useState('flex');
@@ -130,13 +109,51 @@ const PostDetailScreen = () => {
     setDetailDisplay(detailDisplay === 'flex' ? 'none' : 'flex');
   }
 
+  const [likeCnt, setLikeCnt] = useState(post?.line_cnt);
+  const [isLiked, setIsLiked] = useState(post?.is_liked);
+
+  const { mutate } = useMutation(createReaction);
+
+  const handleClickLikePost = () => {
+    if (!post?._id) return;
+    if (isLiked) {
+      setIsLiked(false);
+      setLikeCnt((prev) => prev - 1);
+    } else {
+      setIsLiked(true);
+      setLikeCnt((prev) => prev + 1);
+    }
+    mutate({ postId: post?._id, reactType: 'like' });
+  };
+
+  const route = useRoute();
+  const id = route.params.id;
+  const targetImage = route.params.image;
+
   function onPressCommentsHandler() {
     // const { showingPost } = this.props;
     // const { comments } = showingPost.postDetail;
     navigation.push('Comments', {
-      comments: mockComments,
+      id,
     });
   }
+
+  const { data } = useQuery(['post', 'detail', id], () => getPostDetail(id), {
+    enabled: !!id,
+    select: (data) => data.data,
+    onSuccess(data) {
+      console.log('Get post detail success: ', data);
+    },
+  });
+
+  const post = data?.data?.post;
+
+  useEffect(() => {
+    setLikeCnt(post?.like_cnt);
+    setIsLiked(!!post?.is_liked);
+  }, [post]);
+
+  const renderImage = targetImage ?? post?.images?.[0];
 
   return (
     <TouchableWithoutFeedback onPress={onPressHideDetailWrapperHandler}>
@@ -146,7 +163,7 @@ const PostDetailScreen = () => {
             style={styles.image}
             resizeMode="contain"
             source={{
-              uri: 'https://images.unsplash.com/photo-1674367694162-018eb775ae66?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwxOHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=60',
+              uri: renderImage,
             }}
           ></Image>
         </View>
@@ -209,42 +226,46 @@ const PostDetailScreen = () => {
           }}
         >
           <View>
-            <TouchableOpacity>
-              <Text style={styles.name}>Post username</Text>
+            <TouchableOpacity onPress={handleClickLikePost}>
+              <Text style={styles.name}>{post?.userId?.username}</Text>
             </TouchableOpacity>
-            <Text style={styles.content}>Post content</Text>
-            <Text style={styles.time}>Post created at</Text>
+            {post?.describe && (
+              <Text style={styles.content}>{post.describe}</Text>
+            )}
+            <Text style={styles.time}>{dayjs(post?.createdAt).fromNow()}</Text>
           </View>
           <View style={styles.reactionValueWrapper}>
             <TouchableOpacity>
               <View style={styles.reactionNumberWrapper}>
                 <FontAwesome5Icon
                   name="thumbs-up"
-                  color="#318bfb"
+                  color={isLiked ? '#318bfb' : '#fff'}
                   size={14}
                 ></FontAwesome5Icon>
                 <Text style={{ color: '#fff', marginLeft: 5 }}>
                   {/* {reactionValue} */}
-                  50
+                  {likeCnt}
                 </Text>
               </View>
             </TouchableOpacity>
             <TouchableOpacity onPress={onPressCommentsHandler}>
               <Text style={{ color: '#fff' }}>
                 {/* {postDetail.comments.length} comments */}
-                37 comments
+                {post?.totalComment || 0}{' '}
+                {post?.totalComment > 1 ? 'comments' : 'comment'}
               </Text>
             </TouchableOpacity>
           </View>
           <View style={styles.btnReactionWrapper}>
             <TouchableOpacity
               style={styles.btnWrapper}
+              onPress={handleClickLikePost}
               // onPres={() => (this._isLiked.isLiked = !this._isLiked.isLiked)}
             >
               <View style={styles.reactionBtn}>
                 <FontAwesome5Icon
                   name="thumbs-up"
-                  color="#fff"
+                  color={isLiked ? '#318bfb' : '#fff'}
                   // color={!this._isLiked.isLiked ? '#fff' : '#318bfb'}
                   size={20}
                 ></FontAwesome5Icon>

@@ -83,6 +83,12 @@ Authorization: Bearer {{authToken}}
     "status": "hạnh phúc"
 }
 
+### Get post
+GET {{baseUrl}}/post/63e8afc23cf21face8bf9680
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
 ### 7. Edit post => edit_post
 
 
@@ -114,10 +120,21 @@ Authorization: Bearer {{authToken}}
 }
 
 ### 11. Get post comments => get_comment
-
+GET {{baseUrl}}/comment/post/63e8afc23cf21face8bf9680
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
 
 ### 11. Comment on a post => set_comment
+POST  {{baseUrl}}/comment
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
 
+{
+   "postId": "63e8afc23cf21face8bf9680",
+   "describe": "comment 12"
+}
 
 ### 12. Get user friends => get_user_friends
 GET {{baseUrl}}/friend/list/63e60d4393d45a34d106754c

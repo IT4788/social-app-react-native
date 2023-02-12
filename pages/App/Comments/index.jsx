@@ -1,12 +1,11 @@
-import React from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import {
   TextInput,
   View,
-  ScrollView,
-  Text,
   StyleSheet,
   TouchableOpacity,
   Dimensions,
+  FlatList,
   // TouchableWithoutFeedback,
   // KeyboardAvoidingView,
 } from 'react-native';
@@ -15,99 +14,53 @@ import * as navigation from '../../../navigation/helpers';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import Comment from '../../../components/Comment';
 import { useRoute } from '@react-navigation/native';
-// import AppText from '../../../components/AppText';
-// export default class extends Component {
-//   constructor(props) {
-//     super(props);
-//     this.state = {
-//       scrollEnabled: true,
-//     };
-//   }
-//   componentDidMount() {}
-//   onPressBtnBackHandler() {
-//     navigation.goBack();
-//   }
-//   onPressBackDropHandler() {
-//     navigation.goBack();
-//   }
-//   onScrollHandler(event) {
-//     if (event.nativeEvent.contentOffset.y === 0) {
-//       // this.setState({
-//       //     ...this.state,
-//       //     scrollEnabled: false
-//       // })
-//       // navigation.goBack()
-//     }
-//   }
-//   render() {
-//     const { comments } = this.props.route.params;
-//     return (
-//       <KeyboardAvoidingView
-//         behavior="height"
-//         style={{
-//           backgroundColor: 'rgba(255,255,255,0.0)',
-//           position: 'relative',
-//           height: screenHeight,
-//         }}
-//         enabled
-//       >
-//         <TouchableWithoutFeedback onPress={this.onPressBackDropHandler}>
-//           <View style={{ height: 92 }}></View>
-//         </TouchableWithoutFeedback>
+import { getPostComments } from '../../../services/comment';
+import AppText from '../../../components/AppText';
 
-//         <View style={styles.container}>
-//           <View style={styles.navigationStackBar}>
-//             <TouchableOpacity
-//               onPress={this.onPressBtnBackHandler}
-//               style={styles.btnBack}
-//             >
-//               <FontAwesome5Icon name="arrow-left" size={24}></FontAwesome5Icon>
-//             </TouchableOpacity>
-//             <View style={styles.stackBarTitle}>
-//               <Text style={{ fontSize: 16 }}>Comments</Text>
-//             </View>
-//           </View>
-//           <ScrollView style={styles.commentsWrapper}>
-//             {comments.map((comment, index) => (
-//               <Comment key={index} comment={comment}>
-//                 Detail
-//               </Comment>
-//             ))}
-//           </ScrollView>
-//         </View>
-//         <View style={styles.commentInputWrapper}>
-//           <TouchableOpacity style={styles.cameraIconWrapper}>
-//             <FontAwesome5Icon name="camera" size={20}></FontAwesome5Icon>
-//           </TouchableOpacity>
-//           <View style={styles.textInputWrapper}>
-//             <TextInput autoFocus={true} style={styles.textInput}></TextInput>
-//           </View>
-//           <View style={styles.iconWrapper}>
-//             <TouchableOpacity style={styles.iconItem}>
-//               <FontAwesome5Icon
-//                 name="grip-horizontal"
-//                 size={20}
-//               ></FontAwesome5Icon>
-//             </TouchableOpacity>
-//             <TouchableOpacity style={styles.iconItem}>
-//               <FontAwesome5Icon name="grin-wink" size={20}></FontAwesome5Icon>
-//             </TouchableOpacity>
-//           </View>
-//         </View>
-//       </KeyboardAvoidingView>
-//     );
-//   }
-// }
+const ITEMS_PER_PAGE = 10;
 
 const CommentsScreen = () => {
   const route = useRoute();
-  const comments = route.params?.comments || [];
+  const id = route.params.id;
 
-  console.log({ comments });
+  const [postComments, setPostComments] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
 
   function onPressBackDropHandler() {
     navigation.goBack();
   }
+
+  useLayoutEffect(() => {
+    if (!id) return;
+
+    getPostComments(id, { perPage: ITEMS_PER_PAGE, numberPage: 1 }).then(
+      (data) => {
+        setTotalPage(
+          Math.ceil(data.data?.data.pagination.total / ITEMS_PER_PAGE),
+        );
+        setPostComments(data.data?.data?.comments || []);
+      },
+    );
+  }, [id]);
+
+  const hasMore = currentPage < totalPage;
+  async function handleLoadMoreComments() {
+    if (!hasMore) return;
+
+    getPostComments(id, {
+      perPage: ITEMS_PER_PAGE,
+      numberPage: currentPage + 1,
+    }).then((data) => {
+      setTotalPage(
+        Math.ceil(Number(data.data?.data.pagination.total) / ITEMS_PER_PAGE),
+      );
+      setPostComments((prev) => prev.concat(data.data?.data?.comments || []));
+      setCurrentPage(Number(data.data?.data?.pagination?.page));
+    });
+  }
+
+  console.log({ postComments });
 
   return (
     <View style={{ flex: 1 }}>
@@ -119,26 +72,19 @@ const CommentsScreen = () => {
           <FontAwesome5Icon name="arrow-left" size={24}></FontAwesome5Icon>
         </TouchableOpacity>
         <View style={styles.stackBarTitle}>
-          <Text style={{ fontSize: 16 }}>Comments</Text>
+          <AppText style={{ fontSize: 16 }}>Comments</AppText>
         </View>
       </View>
-      {/* <View
-        style={{
-          width: '100%',
-          height: 60,
-          flexDirection: 'row',
-          borderBottomWidth: 0.5,
-          borderBottomColor: '#8e8e8e',
-          alignItems: 'center',
-        }}
-      >
-        <AppText>Comments</AppText>
-      </View> */}
-      <ScrollView style={styles.commentsWrapper}>
-        {comments.map((comment) => (
-          <Comment key={comment.id} comment={comment} />
-        ))}
-      </ScrollView>
+
+      <FlatList
+        data={postComments}
+        renderItem={({ item }) => <Comment comment={item} />}
+        keyExtractor={(item) => item._id}
+        ListFooterComponent={null}
+        onEndReached={handleLoadMoreComments}
+        style={{ marginBottom: 50, padding: 10, backgroundColor: '#fff' }}
+      />
+
       <View style={styles.commentInputWrapper}>
         <TouchableOpacity style={styles.cameraIconWrapper}>
           <FontAwesome5Icon name="camera" size={20}></FontAwesome5Icon>
