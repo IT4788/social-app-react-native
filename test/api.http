@@ -43,7 +43,7 @@ Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
 ### Get user profile
-@userId = 63e60d4393d45a34d106754c
+@userId = 63e60d2193d45a34d1067546
 GET {{baseUrl}}/user/{{userId}}/profile
 Accept: application/json
 Content-Type: application/json
@@ -58,15 +58,15 @@ Authorization: Bearer {{authToken}}
 
 {
     "phone": "0358446198",
-    "username": "daovanluong123",
+    "username": "daovanluong124",
     "firstName": "dao",
     "lastName": "luong",
     "gender": "male",
     "date_of_birth": "12-10-2001",
     "description":"dcdcdc",
     "address": "hai ba trung",
-    "city": "Ha Noi",
-    "country": "Viet Nam"
+    "city": "Ha Noi"
+    # "country": "Viet Nam"
     # "avatar": "cdcdc",
 }
 
@@ -90,10 +90,28 @@ Authorization: Bearer {{authToken}}
 
 
 ### 9. Get newfeed, get user posts => get_list_posts
+### User's posts
+GET {{baseUrl}}/post/user/63e60d4393d45a34d106754c
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
 
+### New feed
+GET {{baseUrl}}/newfeeds/new
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
 
-### 10. Like post => like_post
+### 10. Like, unlike post => like_post
+POST  {{baseUrl}}/post_reaction
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
 
+{
+    "postId": "63e7a2293338c9b972bdefde",
+    "reactType": "like"
+}
 
 ### 11. Get post comments => get_comment
 
@@ -121,8 +139,8 @@ Authorization: Bearer {{authToken}}
 
 {
     "oldPassword": "1234567@",
-    "newPassword": "123456789",
-    "passwordConfirmation": "123456789"
+    "newPassword": "1234567@",
+    "passwordConfirmation": "1234567@"
 }
 
 ### 17. Block friends

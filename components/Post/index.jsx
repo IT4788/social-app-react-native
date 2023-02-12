@@ -1,13 +1,20 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Avatar from '../Avatar';
 import { TouchableOpacity, View } from 'react-native';
-import { Entypo, AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Entypo, MaterialCommunityIcons } from '@expo/vector-icons';
 import AppText from '../AppText';
 import styled from 'styled-components/native';
 import * as navigation from '../../navigation/helpers';
+import { useAuthContext } from '../../context/AuthContext';
+import { getUserAvatar } from '../../utils/image';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import PostImages from './PostImages';
+import { useMutation } from '@tanstack/react-query';
+import { createReaction } from '../../services/reaction';
 
 const Container = styled.View`
-  flex: 1;
+  /* flex: 1; */
   background-color: #fff;
 `;
 const Header = styled.View`
@@ -32,15 +39,12 @@ const Time = styled(AppText)`
   color: #747476;
 `;
 const PostTitle = styled(AppText)`
-  font-size: 12px;
+  font-size: 14px;
   color: #222121;
   line-height: 16px;
   padding: 0 11px;
-`;
-const Photo = styled.Image`
-  margin-top: 9px;
-  width: 100%;
-  height: 300px;
+  margin-top: 10px;
+  margin-bottom: 5px;
 `;
 const Footer = styled.View`
   padding: 0 11px;
@@ -85,15 +89,50 @@ const BottomDivider = styled.View`
   background: #f0f2f5;
 `;
 
-const Post = () => {
+dayjs.extend(relativeTime);
+
+const Post = ({ post }) => {
   const handleShowPostDetail = () => {
     navigation.navigate('PostDetail');
   };
+  const { user } = useAuthContext();
+
+  const isOwn = user?._id === post?.userId?._id;
 
   const handleGoToProfile = () => {
     // tempory hard code
-    navigation.navigate('ProfileX', { id: '63e60d2193d45a34d1067546' });
+    if (isOwn) {
+      navigation.navigate('Profile');
+    } else {
+      navigation.navigate('ProfileX', { id: post?.userId?._id });
+    }
   };
+
+  const handleClickComment = () => {
+    navigation.navigate('Comments', { post });
+  };
+
+  const [likeCnt, setLikeCnt] = useState(post?.line_cnt);
+  const [isLiked, setIsLiked] = useState(post?.is_liked);
+
+  const { mutate } = useMutation(createReaction);
+
+  const handleClickLikePost = () => {
+    if (!post?._id) return;
+    if (isLiked) {
+      setIsLiked(false);
+      setLikeCnt((prev) => prev - 1);
+    } else {
+      setIsLiked(true);
+      setLikeCnt((prev) => prev + 1);
+    }
+    mutate({ postId: post?._id, reactType: 'like' });
+  };
+
+  useEffect(() => {
+    setLikeCnt(post?.like_cnt);
+    setIsLiked(!!post?.is_liked);
+  }, [post]);
 
   return (
     <Container>
@@ -102,14 +141,14 @@ const Post = () => {
           <TouchableOpacity onPress={handleGoToProfile}>
             <Avatar
               source={{
-                uri: 'https://images.unsplash.com/photo-1510227272981-87123e259b17?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=3759e09a5b9fbe53088b23c615b6312e',
+                uri: getUserAvatar(post?.userId?.avatar),
               }}
             />
           </TouchableOpacity>
           <View style={{ paddingLeft: 10 }}>
-            <User>Regi P</User>
+            <User>{post?.userId?.username}</User>
             <Row>
-              <Time>9m</Time>
+              <Time>{dayjs(post?.createdAt).fromNow()}</Time>
               <Entypo name="dot-single" size={12} color="#747476" />
               <Entypo name="globe" size={10} color="#747476" />
             </Row>
@@ -119,43 +158,50 @@ const Post = () => {
         <Entypo name="dots-three-horizontal" size={15} color="#222121" />
       </Header>
 
-      <TouchableOpacity onPress={handleShowPostDetail}>
-        <PostTitle>
-          Crie na prática uma aplicação utilizando NextJS, ReactJS, React Native
-          e Strap Api.
-        </PostTitle>
-      </TouchableOpacity>
+      {post?.describe && (
+        <TouchableOpacity onPress={handleShowPostDetail}>
+          <PostTitle>{post.describe}</PostTitle>
+        </TouchableOpacity>
+      )}
 
-      <TouchableOpacity onPress={handleShowPostDetail}>
-        <Photo
-          source={{
-            uri: 'https://images.unsplash.com/photo-1674458884347-0b5460be866b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwyMnx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=60',
-          }}
-        />
-      </TouchableOpacity>
+      <PostImages postId={post?._id} images={post?.images} />
 
       <Footer>
         <FooterCount>
           <Row>
             <IconCount>
-              <AntDesign name="like1" size={12} color="#FFFFFF" />
+              <MaterialCommunityIcons
+                name="thumb-up"
+                size={12}
+                color="#FFFFFF"
+              />
+              {/* <AntDesign name="like1" size={12} color="#FFFFFF" /> */}
             </IconCount>
-            <TextCount>88 likes</TextCount>
+            <TextCount>
+              {likeCnt} {likeCnt > 1 ? 'likes' : 'like'}
+            </TextCount>
           </Row>
-          <TextCount>2k comments</TextCount>
+          <TextCount>
+            {post?.totalComment || 0}{' '}
+            {post?.totalComment > 1 ? 'comments' : 'comment'}
+          </TextCount>
         </FooterCount>
 
         <Separator />
 
         <FooterMenu>
-          <Button>
+          <Button onPress={handleClickLikePost}>
             <Icon>
-              <AntDesign name="like2" size={20} color="#424040" />
+              <MaterialCommunityIcons
+                name={isLiked ? 'thumb-up' : 'thumb-up-outline'}
+                size={20}
+                color={isLiked ? '#1877f2' : '#424040'}
+              />
             </Icon>
             <AppText>Like</AppText>
           </Button>
 
-          <Button>
+          <Button onPress={handleClickComment}>
             <Icon>
               <MaterialCommunityIcons
                 name="comment-outline"

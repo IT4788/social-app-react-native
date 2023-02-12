@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 // import { Button } from 'react-native-paper';
 import {
   StyleSheet,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Dimensions,
+  FlatList,
 } from 'react-native';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 // import { useAuthContext } from '../../../context/AuthContext';
@@ -23,13 +24,19 @@ import { getCoverImage, getUserAvatar } from '../../../utils/image';
 import { Ionicons } from '@expo/vector-icons';
 import useUpload from '../../../hooks/useUpload';
 import AppText from '../../../components/AppText';
+import { getUserPosts } from '../../../services/post';
 
 const SCREEN_WIDTH = Math.round(Dimensions.get('window').width);
+
+const ITEMS_PER_PAGE = 4;
 
 const ProfileScreen = () => {
   const { user: loggedInUser, refetchUser } = useAuthContext();
   const [coverImage, setCoverImage] = useState(null);
   const [avatarImage, setAvatarImage] = useState(null);
+  const [userPosts, setUserPosts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
   const id = loggedInUser?._id;
 
   const { handleUploadFile, handleOpenImageLib } = useUpload();
@@ -40,6 +47,20 @@ const ProfileScreen = () => {
     select: (data) => data.data,
     enabled: !!id,
   });
+
+  useLayoutEffect(() => {
+    if (!id) return;
+
+    getUserPosts(id, { perPage: ITEMS_PER_PAGE, numberPage: 1 }).then(
+      (data) => {
+        setTotalPage(
+          Math.ceil(data.data?.data.pagination.total / ITEMS_PER_PAGE),
+        );
+        setUserPosts(data.data?.data?.posts || []);
+      },
+    );
+  }, [id]);
+
   const user = data?.data;
 
   useEffect(() => {
@@ -89,323 +110,277 @@ const ProfileScreen = () => {
     }
   }
 
+  const hasMore = currentPage < totalPage;
+  async function handleLoadMorePost() {
+    if (!hasMore) return;
+
+    getUserPosts(id, {
+      perPage: ITEMS_PER_PAGE,
+      numberPage: currentPage + 1,
+    }).then((data) => {
+      console.log('Get post success: ', data);
+      setTotalPage(
+        Math.ceil(Number(data.data?.data.pagination.total) / ITEMS_PER_PAGE),
+      );
+      setUserPosts((prev) => prev.concat(data.data?.data?.posts || []));
+      setCurrentPage(Number(data.data?.data?.pagination?.page));
+    });
+  }
+
   return (
-    <ScrollView bounces={false} style={styles.container}>
-      <View style={styles.infoWrapper}>
-        <View style={styles.avatarCoverWrapper}>
-          <TouchableOpacity activeOpacity={0.8}>
-            <Image
-              style={styles.cover}
-              source={{
-                uri: coverImage,
-              }}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.btnChangeCover}
-            onPress={handleSelectCoverImage}
-          >
-            <FontAwesome5Icon size={18} name="camera" />
-          </TouchableOpacity>
-          <View style={styles.avatarWrapper}>
-            <TouchableOpacity
-              onPress={handleSelectAvatarImage}
-              activeOpacity={0.9}
-            >
-              <Image
-                style={styles.avatar}
-                source={{
-                  uri: avatarImage,
-                }}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={handleSelectAvatarImage}
-              style={styles.btnChangeAvatar}
-            >
-              <FontAwesome5Icon size={18} name="camera" />
-            </TouchableOpacity>
-          </View>
-        </View>
-        <View style={styles.introWrapper}>
-          <AppText style={styles.name}>{user?.username}</AppText>
-          {user?.firstName && user?.lastName ? (
-            <AppText style={styles.subName}>
-              ({user.lastName} {user.firstName})
-            </AppText>
-          ) : null}
-          {user?.description && (
-            <AppText style={styles.introTxt}>{user?.description} </AppText>
-          )}
-          <View style={styles.introOptionsWrapper}>
-            <TouchableOpacity activeOpacity={0.8} style={styles.btnAddStory}>
-              <FontAwesome5Icon size={16} color="#fff" name="plus-circle" />
-              <AppText
+    <View style={styles.container}>
+      <FlatList
+        ListHeaderComponent={() => (
+          <View style={{ flex: 1 }}>
+            <View style={styles.infoWrapper}>
+              <View style={styles.avatarCoverWrapper}>
+                <TouchableOpacity activeOpacity={0.8}>
+                  <Image
+                    style={styles.cover}
+                    source={{
+                      uri: coverImage,
+                    }}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.btnChangeCover}
+                  onPress={handleSelectCoverImage}
+                >
+                  <FontAwesome5Icon size={18} name="camera" />
+                </TouchableOpacity>
+                <View style={styles.avatarWrapper}>
+                  <TouchableOpacity
+                    onPress={handleSelectAvatarImage}
+                    activeOpacity={0.9}
+                  >
+                    <Image
+                      style={styles.avatar}
+                      source={{
+                        uri: avatarImage,
+                      }}
+                    />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={handleSelectAvatarImage}
+                    style={styles.btnChangeAvatar}
+                  >
+                    <FontAwesome5Icon size={18} name="camera" />
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.introWrapper}>
+                <AppText style={styles.name}>{user?.username}</AppText>
+                {user?.firstName && user?.lastName ? (
+                  <AppText style={styles.subName}>
+                    ({user.lastName} {user.firstName})
+                  </AppText>
+                ) : null}
+                {user?.description && (
+                  <AppText style={styles.introTxt}>
+                    {user?.description}{' '}
+                  </AppText>
+                )}
+                <View style={styles.introOptionsWrapper}>
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    style={styles.btnAddStory}
+                  >
+                    <FontAwesome5Icon
+                      size={16}
+                      color="#fff"
+                      name="plus-circle"
+                    />
+                    <AppText
+                      style={{
+                        fontSize: 16,
+                        fontWeight: '500',
+                        color: '#fff',
+                        marginLeft: 5,
+                      }}
+                    >
+                      Add to your story
+                    </AppText>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    // onPress={this.onPressProfileSettingHandler}
+                    activeOpacity={0.8}
+                    style={styles.btnOption}
+                  >
+                    <FontAwesome5Icon
+                      size={20}
+                      color="#000"
+                      name="ellipsis-h"
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.introListWrapper}>
+                {user?.worked_at && (
+                  <View style={styles.introLine}>
+                    <FontAwesome5Icon
+                      size={20}
+                      color="#333"
+                      style={styles.introIcon}
+                      name="briefcase"
+                    />
+                    <AppText style={styles.introLineText}>
+                      Work at{' '}
+                      <AppText style={styles.introHightLight}>
+                        {user?.worked_at}
+                      </AppText>
+                    </AppText>
+                  </View>
+                )}
+                {user?.studied_at && (
+                  <View style={styles.introLine}>
+                    <Ionicons
+                      name="school"
+                      size={20}
+                      color="#333"
+                      style={styles.introIcon}
+                    />
+                    <AppText style={styles.introLineText}>
+                      Study at{' '}
+                      <AppText style={styles.introHightLight}>
+                        {user?.studied_at}
+                      </AppText>
+                    </AppText>
+                  </View>
+                )}
+
+                {user?.current_address && (
+                  <View style={styles.introLine}>
+                    <FontAwesome5Icon
+                      size={20}
+                      color="#333"
+                      style={styles.introIcon}
+                      name="home"
+                    />
+                    <AppText style={styles.introLineText}>
+                      Live in{' '}
+                      <AppText style={styles.introHightLight}>
+                        {user?.current_address}
+                      </AppText>
+                    </AppText>
+                  </View>
+                )}
+
+                {user?.from_address && (
+                  <View style={styles.introLine}>
+                    <FontAwesome5Icon
+                      size={20}
+                      color="#333"
+                      style={styles.introIcon}
+                      name="map-marker-alt"
+                    />
+                    <AppText style={styles.introLineText}>
+                      From{' '}
+                      <AppText style={styles.introHightLight}>
+                        {user?.from_address}
+                      </AppText>
+                    </AppText>
+                  </View>
+                )}
+              </View>
+              <View
                 style={{
-                  fontSize: 16,
-                  fontWeight: '500',
-                  color: '#fff',
-                  marginLeft: 5,
+                  paddingVertical: 20,
+                  borderBottomWidth: 0.5,
+                  borderBottomColor: '#ddd',
                 }}
               >
-                Add to your story
-              </AppText>
-            </TouchableOpacity>
-            <TouchableOpacity
-              // onPress={this.onPressProfileSettingHandler}
-              activeOpacity={0.8}
-              style={styles.btnOption}
+                <TouchableOpacity
+                  onPress={onPressEditPublicInfoHandler}
+                  activeOpacity={0.8}
+                  style={styles.btnEditPublicDetail}
+                >
+                  <AppText
+                    style={{
+                      color: '#318bfb',
+                      fontSize: 16,
+                      fontWeight: '500',
+                    }}
+                  >
+                    Edit public info
+                  </AppText>
+                </TouchableOpacity>
+              </View>
+              <FriendsShowing
+                friends={[
+                  {
+                    name: 'Dao Cam Tu',
+                    avatar_url:
+                      'https://randomuser.me/api/portraits/women/79.jpg',
+                  },
+                ]}
+              />
+            </View>
+            <View style={{ marginTop: 20 }}>
+              <ToolBar />
+            </View>
+            <ScrollView
+              alignItems="center"
+              bounces={false}
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+              style={styles.navigationsWrapper}
             >
-              <FontAwesome5Icon size={20} color="#000" name="ellipsis-h" />
-            </TouchableOpacity>
-          </View>
-        </View>
-        <View style={styles.introListWrapper}>
-          {user?.worked_at && (
-            <View style={styles.introLine}>
-              <FontAwesome5Icon
-                size={20}
-                color="#333"
-                style={styles.introIcon}
-                name="briefcase"
-              />
-              <AppText style={styles.introLineText}>
-                Work at{' '}
-                <AppText style={styles.introHightLight}>
-                  {user?.worked_at}
+              <TouchableOpacity style={styles.navigation}>
+                <FontAwesome5Icon
+                  style={styles.navigationIcon}
+                  color="#000"
+                  size={20}
+                  name="images"
+                />
+                <AppText style={{ fontSize: 16, fontWeight: '500' }}>
+                  Images
                 </AppText>
-              </AppText>
-            </View>
-          )}
-          {user?.studied_at && (
-            <View style={styles.introLine}>
-              <Ionicons
-                name="school"
-                size={20}
-                color="#333"
-                style={styles.introIcon}
-              />
-              <AppText style={styles.introLineText}>
-                Study at{' '}
-                <AppText style={styles.introHightLight}>
-                  {user?.studied_at}
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.navigation}>
+                <FontAwesome5Icon
+                  style={styles.navigationIcon}
+                  color="#000"
+                  size={20}
+                  name="video"
+                />
+                <AppText style={{ fontSize: 16, fontWeight: '500' }}>
+                  Videos
                 </AppText>
-              </AppText>
-            </View>
-          )}
-
-          {user?.current_address && (
-            <View style={styles.introLine}>
-              <FontAwesome5Icon
-                size={20}
-                color="#333"
-                style={styles.introIcon}
-                name="home"
-              />
-              <AppText style={styles.introLineText}>
-                Live in{' '}
-                <AppText style={styles.introHightLight}>
-                  {user?.current_address}
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.navigation}>
+                <FontAwesome5Icon
+                  style={styles.navigationIcon}
+                  color="#000"
+                  size={20}
+                  name="calendar-week"
+                />
+                <AppText style={{ fontSize: 16, fontWeight: '500' }}>
+                  Life event
                 </AppText>
-              </AppText>
-            </View>
-          )}
-
-          {user?.from_address && (
-            <View style={styles.introLine}>
-              <FontAwesome5Icon
-                size={20}
-                color="#333"
-                style={styles.introIcon}
-                name="map-marker-alt"
-              />
-              <AppText style={styles.introLineText}>
-                From{' '}
-                <AppText style={styles.introHightLight}>
-                  {user?.from_address}
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{ ...styles.navigation, ...styles.lastNavigation }}
+              >
+                <FontAwesome5Icon
+                  style={styles.navigationIcon}
+                  color="#000"
+                  size={20}
+                  name="music"
+                />
+                <AppText style={{ fontSize: 16, fontWeight: '500' }}>
+                  Music
                 </AppText>
-              </AppText>
-            </View>
-          )}
-          {/*
-          <View style={styles.introLine}>
-            <FontAwesome5Icon
-              size={20}
-              color="#333"
-              style={styles.introIcon}
-              name="heart"
-            />
-            <Text style={styles.introLineText}>
-              Relationship{' '}
-              <Text style={styles.introHightLight}>User relationship</Text>
-            </Text>
+              </TouchableOpacity>
+            </ScrollView>
           </View>
-          <View style={styles.introLine}>
-            <FontAwesome5Icon
-              size={20}
-              color="#333"
-              style={styles.introIcon}
-              name="rss"
-            />
-            <Text style={styles.introLineText}>
-              Followed by <Text style={styles.introHightLight}>40 </Text>
-              followers
-            </Text>
-          </View>
-          <View style={styles.introLine}>
-            <FontAwesome5Icon
-              size={20}
-              color="#333"
-              style={styles.introIcon}
-              name="github"
-            />
-            <TouchableOpacity>
-              <Text style={styles.introLineText}>https://youtube.com</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.introLine}>
-            <FontAwesome5Icon
-              size={20}
-              color="#333"
-              style={styles.introIcon}
-              name="link"
-            />
-            <TouchableOpacity>
-              <Text style={styles.introLineText}>skcmkmcdkmcdkmckdmcdkmcd</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.introLine}>
-            <FontAwesome5Icon
-              size={20}
-              color="#333"
-              style={styles.introIcon}
-              name="ellipsis-h"
-            />
-            <TouchableOpacity>
-              <Text style={styles.introLineText}>
-                View more introductory information
-              </Text>
-            </TouchableOpacity>
-          </View> */}
-        </View>
-        {/* <HightlightPhotos
-          photos={[
-            {
-              photo_url:
-                'https://images.unsplash.com/photo-1674231313303-ab9bd1196390?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw0OXx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=60',
-            },
-            {
-              photo_url:
-                'https://images.unsplash.com/photo-1674231313303-ab9bd1196390?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw0OXx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=60',
-            },
-            {
-              photo_url:
-                'https://images.unsplash.com/photo-1674231313303-ab9bd1196390?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw0OXx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=60',
-            },
-            {
-              photo_url:
-                'https://images.unsplash.com/photo-1674231313303-ab9bd1196390?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw0OXx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=60',
-            },
-            {
-              photo_url:
-                'https://images.unsplash.com/photo-1674231313303-ab9bd1196390?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw0OXx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=60',
-            },
-            {
-              photo_url:
-                'https://images.unsplash.com/photo-1674231313303-ab9bd1196390?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw0OXx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=60',
-            },
-          ]}
-        /> */}
-        <View
-          style={{
-            paddingVertical: 20,
-            borderBottomWidth: 0.5,
-            borderBottomColor: '#ddd',
-          }}
-        >
-          <TouchableOpacity
-            onPress={onPressEditPublicInfoHandler}
-            activeOpacity={0.8}
-            style={styles.btnEditPublicDetail}
-          >
-            <AppText
-              style={{ color: '#318bfb', fontSize: 16, fontWeight: '500' }}
-            >
-              Edit public info
-            </AppText>
-          </TouchableOpacity>
-        </View>
-        <FriendsShowing
-          friends={[
-            {
-              name: 'Dao Cam Tu',
-              avatar_url: 'https://randomuser.me/api/portraits/women/79.jpg',
-            },
-          ]}
-        />
-      </View>
-      <View style={{ marginTop: 20 }}>
-        <ToolBar />
-      </View>
-      {/* <PostTool /> */}
-      <ScrollView
-        alignItems="center"
-        bounces={false}
-        horizontal={true}
-        showsHorizontalScrollIndicator={false}
-        style={styles.navigationsWrapper}
-      >
-        <TouchableOpacity style={styles.navigation}>
-          <FontAwesome5Icon
-            style={styles.navigationIcon}
-            color="#000"
-            size={20}
-            name="images"
-          />
-          <AppText style={{ fontSize: 16, fontWeight: '500' }}>Images</AppText>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navigation}>
-          <FontAwesome5Icon
-            style={styles.navigationIcon}
-            color="#000"
-            size={20}
-            name="video"
-          />
-          <AppText style={{ fontSize: 16, fontWeight: '500' }}>Videos</AppText>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navigation}>
-          <FontAwesome5Icon
-            style={styles.navigationIcon}
-            color="#000"
-            size={20}
-            name="calendar-week"
-          />
-          <AppText style={{ fontSize: 16, fontWeight: '500' }}>
-            Life event
-          </AppText>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{ ...styles.navigation, ...styles.lastNavigation }}
-        >
-          <FontAwesome5Icon
-            style={styles.navigationIcon}
-            color="#000"
-            size={20}
-            name="music"
-          />
-          <AppText style={{ fontSize: 16, fontWeight: '500' }}>Music</AppText>
-        </TouchableOpacity>
-      </ScrollView>
-      {/* <ProfilePosts
-        highLightPhotos={highlightPhotos}
-        profilePosts={profilePosts}
-      ></ProfilePosts> */}
-      {Array(6)
-        .fill(1)
-        .map((_, index) => (
-          <Post key={index} />
-        ))}
-    </ScrollView>
+        )}
+        data={userPosts}
+        renderItem={(item) => <Post post={item.item} />}
+        keyExtractor={(item) => item._id}
+        ListFooterComponent={null}
+        onEndReached={handleLoadMorePost}
+      />
+    </View>
   );
 };
 

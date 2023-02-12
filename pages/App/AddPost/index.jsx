@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View, Image } from 'react-native';
 import styled from 'styled-components';
 import FAIcon from 'react-native-vector-icons/FontAwesome5';
@@ -199,21 +199,31 @@ const AddPostScreen = ({ navigation }) => {
 
   const { mutate: addPostMutation } = useMutation(addPost, {
     onSuccess() {
+      setText('');
+      setImages([]);
       navigation.push('Home');
     },
   });
 
   const handleSubmit = () => {
-    if (!text || !images.length) {
+    if (!text.trim() && !images.length) {
       alert('Please enter text or select images');
       return;
     }
 
-    addPostMutation('post', {
-      describe: text,
+    addPostMutation({
+      describe: text.trim(),
       images: images.map((i) => i.uri),
+      // baseUrl: 'http'
     });
   };
+
+  useEffect(() => {
+    return () => {
+      setText('');
+      setImages([]);
+    };
+  }, []);
 
   return (
     <>
