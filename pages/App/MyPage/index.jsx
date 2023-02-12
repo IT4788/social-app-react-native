@@ -78,7 +78,7 @@ const MyPageScreen = () => {
           </View>
         </ExTouchableOpacity> */}
         <ExTouchableOpacity
-          onPress={() => navigation.push('FullFriends')}
+          onPress={() => navigation.navigate('FullFriends')}
           style={styles.btnOption}
         >
           <Image
@@ -91,8 +91,8 @@ const MyPageScreen = () => {
           </View>
         </ExTouchableOpacity>
         <ExTouchableOpacity
-          // onPress={() => navigation.push('FullFriends')}
           style={styles.btnOption}
+          onPress={() => navigation.navigate('RequestedFriends')}
         >
           <Image
             style={styles.icon}
@@ -100,7 +100,21 @@ const MyPageScreen = () => {
           />
           <View>
             <AppText style={styles.name}>Requested Friends</AppText>
-            {/* Lời mời kết bạn */}
+            {/* Người khác gửi lời mời kết bạn với mình */}
+          </View>
+        </ExTouchableOpacity>
+
+        <ExTouchableOpacity
+          onPress={() => navigation.navigate('RequestingFriends')}
+          style={styles.btnOption}
+        >
+          <Image
+            style={styles.icon}
+            source={require('../../../assets/icons/friendship.png')}
+          />
+          <View>
+            <AppText style={styles.name}>Requesting Friends</AppText>
+            {/* Mình đang gửi lời mời kết bạn */}
           </View>
         </ExTouchableOpacity>
 
@@ -131,6 +145,7 @@ const MyPageScreen = () => {
         <ExTouchableOpacity
           // onPress={this.onpressFriendAroundHandler}
           style={styles.btnOption}
+          onPress={() => navigation.navigate('SuggestedFriends')}
         >
           <Image
             style={styles.icon}

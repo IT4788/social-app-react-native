@@ -16,6 +16,9 @@ import MyPageScreen from '../pages/App/MyPage';
 import ChangePasswordScreen from '../pages/App/ChangePassword';
 import MessagesScreen from '../pages/App/Messages';
 import ConversationsScreen from '../pages/App/Conversations';
+import SuggestedFriendsScreen from '../pages/App/SuggestedFriends';
+import RequestingFriendsScreen from '../pages/App/RequestingFriends';
+import RequestedFriendsScreen from '../pages/App/RequestedFriends';
 
 const RootStack = createNativeStackNavigator();
 
@@ -90,6 +93,21 @@ const AppStack = () => {
       <RootStack.Screen
         name="Conversations"
         component={ConversationsScreen}
+        options={{ headerShown: false }}
+      />
+      <RootStack.Screen
+        name="SuggestedFriends"
+        component={SuggestedFriendsScreen}
+        options={{ headerShown: false }}
+      />
+      <RootStack.Screen
+        name="RequestingFriends"
+        component={RequestingFriendsScreen}
+        options={{ headerShown: false }}
+      />
+      <RootStack.Screen
+        name="RequestedFriends"
+        component={RequestedFriendsScreen}
         options={{ headerShown: false }}
       />
       <RootStack.Screen name="Explore" component={ExploreScreen} />

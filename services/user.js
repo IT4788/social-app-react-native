@@ -11,3 +11,7 @@ export function updateProfileInfo(data) {
 export function changePassword(data) {
   return client.patch('user/change_password', data);
 }
+
+export function getSuggestedFriend(config) {
+  return client.get('user/suggest', { params: config });
+}

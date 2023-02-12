@@ -120,15 +120,48 @@ Authorization: Bearer {{authToken}}
 
 
 ### 12. Get user friends => get_user_friends
-
+GET {{baseUrl}}/friend/list/63e60d4393d45a34d106754c
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
 
 ### 13. Request friend
+POST {{baseUrl}}/friend/63e60d2193d45a34d1067546
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
 
+### 13. Cancel friend request
+DELETE  {{baseUrl}}/friend/63e60d2193d45a34d1067546
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
 
 ### 14. Accept Friend
+### Accept friend request
+PATCH   {{baseUrl}}/friend/approve/63e60d2193d45a34d1067546
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+### Reject friend request
+PATCH   {{baseUrl}}/friend/reject/63e60d2193d45a34d1067546
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
 
 
 ### 15. Get list requested friends
+### Get all requesting friends
+GET {{baseUrl}}/friend/requested/sent
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+### Get all requested friends
+GET {{baseUrl}}/friend/requested/recieved
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
 
 
 ### 16. Change user password
@@ -150,6 +183,10 @@ Authorization: Bearer {{authToken}}
 
 
 ### 22. Get list suggested friends
+GET {{baseUrl}}/user/suggest
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
 
 
 ### 19. Get list conversations

@@ -81,7 +81,7 @@ const ProfileXScreen = () => {
                 marginLeft: 5,
               }}
             >
-              {'Remove request'}
+              {'Cancel request'}
             </AppText>
           </TouchableOpacity>
         );
