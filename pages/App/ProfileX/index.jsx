@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import {
   StyleSheet,
@@ -6,6 +6,7 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
+  FlatList,
 } from 'react-native';
 import ExTouchableOpacity from '../../../components/ExTouchableOpacity';
 import {
@@ -27,6 +28,9 @@ import {
   createFriendRequest,
   getUserFriends,
 } from '../../../services/friend';
+import { getUserPosts } from '../../../services/post';
+
+const ITEMS_PER_PAGE = 4;
 
 const ProfileXScreen = () => {
   // const isFriend = true;
@@ -34,6 +38,9 @@ const ProfileXScreen = () => {
   const route = useRoute();
   const [friendStatus, setFriendStatus] = useState('no_request');
   const [friendsData, setFriendsData] = useState({});
+  const [userPosts, setUserPosts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
 
   const id = route.params?.id;
 
@@ -149,6 +156,36 @@ const ProfileXScreen = () => {
       .catch(console.log);
   }, [id]);
 
+  useLayoutEffect(() => {
+    if (!id) return;
+
+    getUserPosts(id, { perPage: ITEMS_PER_PAGE, numberPage: 1 }).then(
+      (data) => {
+        setTotalPage(
+          Math.ceil(data.data?.data.pagination.total / ITEMS_PER_PAGE),
+        );
+        setUserPosts(data.data?.data?.posts || []);
+        console.log('Data: ', data);
+      },
+    );
+  }, [id]);
+
+  const hasMore = currentPage < totalPage;
+  async function handleLoadMorePost() {
+    if (!hasMore) return;
+
+    getUserPosts(id, {
+      perPage: ITEMS_PER_PAGE,
+      numberPage: currentPage + 1,
+    }).then((data) => {
+      setTotalPage(
+        Math.ceil(Number(data.data?.data.pagination.total) / ITEMS_PER_PAGE),
+      );
+      setUserPosts((prev) => prev.concat(data.data?.data?.posts || []));
+      setCurrentPage(Number(data.data?.data?.pagination?.page));
+    });
+  }
+
   return (
     <View style={styles.superContainer}>
       <View style={styles.navigationBar}>
@@ -176,224 +213,215 @@ const ProfileXScreen = () => {
           </AppText>
         </ExTouchableOpacity>
       </View>
-      <ScrollView bounces={false} style={styles.container}>
-        <View style={styles.infoWrapper}>
-          <View style={styles.avatarCoverWrapper}>
-            <TouchableOpacity activeOpacity={0.8}>
-              <Image
-                style={styles.cover}
-                source={{
-                  uri:
-                    user?.cover_image ??
-                    'https://tokystorage.s3.amazonaws.com/images/default-cover.png',
-                }}
-              />
-            </TouchableOpacity>
-            <View style={styles.avatarWrapper}>
-              <TouchableOpacity activeOpacity={0.9}>
-                <Image
-                  style={styles.avatar}
-                  source={{
-                    uri:
-                      user?.avatar ??
-                      'https://www.pngitem.com/pimgs/m/150-1503945_transparent-user-png-default-user-image-png-png.png',
-                  }}
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
-          <View style={styles.introWrapper}>
-            <AppText style={styles.name}>{user?.username}</AppText>
-            {user?.firstName && user?.lastName ? (
-              <AppText style={styles.subName}>
-                ({user.lastName} {user.firstName})
-              </AppText>
-            ) : null}
-            {user?.description && (
-              <AppText style={styles.introTxt}>{user?.description} </AppText>
-            )}
-            <View style={styles.introOptionsWrapper}>
-              {renderButton()}
-              {/* <TouchableOpacity activeOpacity={0.8} style={styles.btnOption}>
+      <View style={styles.container}>
+        <FlatList
+          ListHeaderComponent={() => (
+            <View style={{ flex: 1 }}>
+              <View style={styles.infoWrapper}>
+                <View style={styles.avatarCoverWrapper}>
+                  <TouchableOpacity activeOpacity={0.8}>
+                    <Image
+                      style={styles.cover}
+                      source={{
+                        uri:
+                          user?.cover_image ??
+                          'https://tokystorage.s3.amazonaws.com/images/default-cover.png',
+                      }}
+                    />
+                  </TouchableOpacity>
+                  <View style={styles.avatarWrapper}>
+                    <TouchableOpacity activeOpacity={0.9}>
+                      <Image
+                        style={styles.avatar}
+                        source={{
+                          uri:
+                            user?.avatar ??
+                            'https://www.pngitem.com/pimgs/m/150-1503945_transparent-user-png-default-user-image-png-png.png',
+                        }}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                <View style={styles.introWrapper}>
+                  <AppText style={styles.name}>{user?.username}</AppText>
+                  {user?.firstName && user?.lastName ? (
+                    <AppText style={styles.subName}>
+                      ({user.lastName} {user.firstName})
+                    </AppText>
+                  ) : null}
+                  {user?.description && (
+                    <AppText style={styles.introTxt}>
+                      {user?.description}{' '}
+                    </AppText>
+                  )}
+                  <View style={styles.introOptionsWrapper}>
+                    {renderButton()}
+                    {/* <TouchableOpacity activeOpacity={0.8} style={styles.btnOption}>
                 <FontAwesome5Icon
                   size={20}
                   color="#000"
                   name={isFriend ? 'user-check' : 'facebook-messenger'}
                 />
               </TouchableOpacity> */}
-              <TouchableOpacity activeOpacity={0.8} style={styles.btnOption}>
-                <FontAwesome5Icon size={20} color="#000" name="ellipsis-h" />
-              </TouchableOpacity>
+                    <TouchableOpacity
+                      activeOpacity={0.8}
+                      style={styles.btnOption}
+                    >
+                      <FontAwesome5Icon
+                        size={20}
+                        color="#000"
+                        name="ellipsis-h"
+                      />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                <View style={styles.introListWrapper}>
+                  {user?.worked_at && (
+                    <View style={styles.introLine}>
+                      <FontAwesome5Icon
+                        size={20}
+                        color="#333"
+                        style={styles.introIcon}
+                        name="briefcase"
+                      />
+                      <AppText style={styles.introLineText}>
+                        Work at{' '}
+                        <AppText style={styles.introHightLight}>
+                          {user?.worked_at}
+                        </AppText>
+                      </AppText>
+                    </View>
+                  )}
+                  {user?.studied_at && (
+                    <View style={styles.introLine}>
+                      <Ionicons
+                        name="school"
+                        size={20}
+                        color="#333"
+                        style={styles.introIcon}
+                      />
+                      <AppText style={styles.introLineText}>
+                        Study at{' '}
+                        <AppText style={styles.introHightLight}>
+                          {user?.studied_at}
+                        </AppText>
+                      </AppText>
+                    </View>
+                  )}
+
+                  {user?.current_address && (
+                    <View style={styles.introLine}>
+                      <FontAwesome5Icon
+                        size={20}
+                        color="#333"
+                        style={styles.introIcon}
+                        name="home"
+                      />
+                      <AppText style={styles.introLineText}>
+                        Live in{' '}
+                        <AppText style={styles.introHightLight}>
+                          {user?.current_address}
+                        </AppText>
+                      </AppText>
+                    </View>
+                  )}
+
+                  {user?.from_address && (
+                    <View style={styles.introLine}>
+                      <FontAwesome5Icon
+                        size={20}
+                        color="#333"
+                        style={styles.introIcon}
+                        name="map-marker-alt"
+                      />
+                      <AppText style={styles.introLineText}>
+                        From{' '}
+                        <AppText style={styles.introHightLight}>
+                          {user?.from_address}
+                        </AppText>
+                      </AppText>
+                    </View>
+                  )}
+                </View>
+                <FriendsShowing
+                  friends={friendsData?.friends || []}
+                  totalFriend={friendsData?.pagination?.total || 0}
+                  isUserX
+                  mututalCount={3}
+                  userId={user?._id}
+                />
+              </View>
+              <View style={{ marginTop: 20 }}>
+                <ToolBar />
+              </View>
+              <ScrollView
+                alignItems="center"
+                bounces={false}
+                horizontal={true}
+                showsHorizontalScrollIndicator={false}
+                style={styles.navigationsWrapper}
+              >
+                <TouchableOpacity style={styles.navigation}>
+                  <FontAwesome5Icon
+                    style={styles.navigationIcon}
+                    color="#000"
+                    size={20}
+                    name="images"
+                  />
+                  <AppText style={{ fontSize: 16, fontWeight: '500' }}>
+                    Images
+                  </AppText>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.navigation}>
+                  <FontAwesome5Icon
+                    style={styles.navigationIcon}
+                    color="#000"
+                    size={20}
+                    name="video"
+                  />
+                  <AppText style={{ fontSize: 16, fontWeight: '500' }}>
+                    Videos
+                  </AppText>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.navigation}>
+                  <FontAwesome5Icon
+                    style={styles.navigationIcon}
+                    color="#000"
+                    size={20}
+                    name="calendar-week"
+                  />
+                  <AppText style={{ fontSize: 16, fontWeight: '500' }}>
+                    Life event
+                  </AppText>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{ ...styles.navigation, ...styles.lastNavigation }}
+                >
+                  <FontAwesome5Icon
+                    style={styles.navigationIcon}
+                    color="#000"
+                    size={20}
+                    name="music"
+                  />
+                  <AppText style={{ fontSize: 16, fontWeight: '500' }}>
+                    Music
+                  </AppText>
+                </TouchableOpacity>
+              </ScrollView>
             </View>
-          </View>
-          <View style={styles.introListWrapper}>
-            {user?.worked_at && (
-              <View style={styles.introLine}>
-                <FontAwesome5Icon
-                  size={20}
-                  color="#333"
-                  style={styles.introIcon}
-                  name="briefcase"
-                />
-                <AppText style={styles.introLineText}>
-                  Work at{' '}
-                  <AppText style={styles.introHightLight}>
-                    {user?.worked_at}
-                  </AppText>
-                </AppText>
-              </View>
-            )}
-            {user?.studied_at && (
-              <View style={styles.introLine}>
-                <Ionicons
-                  name="school"
-                  size={20}
-                  color="#333"
-                  style={styles.introIcon}
-                />
-                <AppText style={styles.introLineText}>
-                  Study at{' '}
-                  <AppText style={styles.introHightLight}>
-                    {user?.studied_at}
-                  </AppText>
-                </AppText>
-              </View>
-            )}
-
-            {user?.current_address && (
-              <View style={styles.introLine}>
-                <FontAwesome5Icon
-                  size={20}
-                  color="#333"
-                  style={styles.introIcon}
-                  name="home"
-                />
-                <AppText style={styles.introLineText}>
-                  Live in{' '}
-                  <AppText style={styles.introHightLight}>
-                    {user?.current_address}
-                  </AppText>
-                </AppText>
-              </View>
-            )}
-
-            {user?.from_address && (
-              <View style={styles.introLine}>
-                <FontAwesome5Icon
-                  size={20}
-                  color="#333"
-                  style={styles.introIcon}
-                  name="map-marker-alt"
-                />
-                <AppText style={styles.introLineText}>
-                  From{' '}
-                  <AppText style={styles.introHightLight}>
-                    {user?.from_address}
-                  </AppText>
-                </AppText>
-              </View>
-            )}
-          </View>
-          {/* <HightlightPhotos
-            photos={[
-              {
-                photo_url:
-                  'https://images.unsplash.com/photo-1674231313303-ab9bd1196390?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw0OXx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=60',
-              },
-              {
-                photo_url:
-                  'https://images.unsplash.com/photo-1674231313303-ab9bd1196390?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw0OXx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=60',
-              },
-              {
-                photo_url:
-                  'https://images.unsplash.com/photo-1674231313303-ab9bd1196390?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw0OXx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=60',
-              },
-              {
-                photo_url:
-                  'https://images.unsplash.com/photo-1674231313303-ab9bd1196390?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw0OXx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=60',
-              },
-              {
-                photo_url:
-                  'https://images.unsplash.com/photo-1674231313303-ab9bd1196390?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw0OXx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=60',
-              },
-              {
-                photo_url:
-                  'https://images.unsplash.com/photo-1674231313303-ab9bd1196390?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw0OXx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=60',
-              },
-            ]}
-          /> */}
-          <View
-          // style={{ borderBottomWidth: 0.5, borderBottomColor: '#ddd' }}
-          ></View>
-          <FriendsShowing
-            friends={friendsData?.friends || []}
-            totalFriend={friendsData?.pagination?.total || 0}
-            isUserX
-            mututalCount={3}
-            userId={user?._id}
-          />
-        </View>
-        <View style={{ marginTop: 20 }}>
-          <ToolBar />
-        </View>
-        <ScrollView
-          alignItems="center"
-          bounces={false}
-          horizontal={true}
-          showsHorizontalScrollIndicator={false}
-          style={styles.navigationsWrapper}
-        >
-          <TouchableOpacity style={styles.navigation}>
-            <FontAwesome5Icon
-              style={styles.navigationIcon}
-              color="#000"
-              size={20}
-              name="images"
-            />
-            <AppText style={{ fontSize: 16, fontWeight: '500' }}>
-              Images
-            </AppText>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.navigation}>
-            <FontAwesome5Icon
-              style={styles.navigationIcon}
-              color="#000"
-              size={20}
-              name="video"
-            />
-            <AppText style={{ fontSize: 16, fontWeight: '500' }}>
-              Videos
-            </AppText>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.navigation}>
-            <FontAwesome5Icon
-              style={styles.navigationIcon}
-              color="#000"
-              size={20}
-              name="calendar-week"
-            />
-            <AppText style={{ fontSize: 16, fontWeight: '500' }}>
-              Life event
-            </AppText>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{ ...styles.navigation, ...styles.lastNavigation }}
-          >
-            <FontAwesome5Icon
-              style={styles.navigationIcon}
-              color="#000"
-              size={20}
-              name="music"
-            />
-            <AppText style={{ fontSize: 16, fontWeight: '500' }}>Music</AppText>
-          </TouchableOpacity>
-        </ScrollView>
-        {Array(6)
+          )}
+          data={userPosts}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item: post }) => <Post post={post} />}
+          ListFooterComponent={null}
+          onEndReached={handleLoadMorePost}
+        />
+        {/* {Array(6)
           .fill(1)
           .map((_, index) => (
             <Post key={index} />
-          ))}
-      </ScrollView>
+          ))} */}
+      </View>
     </View>
   );
 };

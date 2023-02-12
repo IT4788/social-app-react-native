@@ -33,15 +33,15 @@ const Button = styled.TouchableOpacity`
 
 const AppBar = () => {
   const onPressNotification = () => {
-    navigation.navigate('Notifications');
+    navigation.push('Notifications');
   };
 
   const onPressMenu = () => {
-    navigation.navigate('MyPage');
+    navigation.push('MyPage');
   };
 
   const onPressMessages = () => {
-    navigation.navigate('Conversations');
+    navigation.push('Conversations');
   };
 
   return (

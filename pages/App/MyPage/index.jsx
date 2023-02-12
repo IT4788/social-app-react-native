@@ -78,7 +78,7 @@ const MyPageScreen = () => {
           </View>
         </ExTouchableOpacity> */}
         <ExTouchableOpacity
-          onPress={() => navigation.navigate('FullFriends', { id: user?._id })}
+          onPress={() => navigation.push('FullFriends', { id: user?._id })}
           style={styles.btnOption}
         >
           <Image
@@ -92,7 +92,7 @@ const MyPageScreen = () => {
         </ExTouchableOpacity>
         <ExTouchableOpacity
           style={styles.btnOption}
-          onPress={() => navigation.navigate('RequestedFriends')}
+          onPress={() => navigation.push('RequestedFriends')}
         >
           <Image
             style={styles.icon}
@@ -105,7 +105,7 @@ const MyPageScreen = () => {
         </ExTouchableOpacity>
 
         <ExTouchableOpacity
-          onPress={() => navigation.navigate('RequestingFriends')}
+          onPress={() => navigation.push('RequestingFriends')}
           style={styles.btnOption}
         >
           <Image
@@ -145,7 +145,7 @@ const MyPageScreen = () => {
         <ExTouchableOpacity
           // onPress={this.onpressFriendAroundHandler}
           style={styles.btnOption}
-          onPress={() => navigation.navigate('SuggestedFriends')}
+          onPress={() => navigation.push('SuggestedFriends')}
         >
           <Image
             style={styles.icon}

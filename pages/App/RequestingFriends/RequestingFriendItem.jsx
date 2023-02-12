@@ -20,7 +20,7 @@ const RequestingFriendItem = ({ friend, onDecreaseTotal }) => {
     <View>
       <ExTouchableOpacity
         onPress={() => {
-          navigation.navigate('ProfileX', { id: friend._id });
+          navigation.push('ProfileX', { id: friend._id });
         }}
         style={styles.friendItem}
       >

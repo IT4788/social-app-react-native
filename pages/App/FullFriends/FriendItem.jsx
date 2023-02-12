@@ -20,7 +20,7 @@ const FriendItem = ({ friend }) => {
     <View>
       <ExTouchableOpacity
         onPress={() => {
-          navigation.navigate('ProfileX', { id: friend._id });
+          navigation.push('ProfileX', { id: friend._id });
         }}
         style={styles.friendItem}
       >
@@ -39,7 +39,7 @@ const FriendItem = ({ friend }) => {
             <View style={{ flexDirection: 'row' }}>
               <TouchableOpacity
                 style={styles.addFriendBtn}
-                onPress={() => navigation.navigate('Messages')}
+                onPress={() => navigation.push('Messages')}
               >
                 <AppText style={styles.btnText}>Send message</AppText>
               </TouchableOpacity>

@@ -93,7 +93,7 @@ dayjs.extend(relativeTime);
 
 const Post = ({ post }) => {
   const handleShowPostDetail = () => {
-    navigation.navigate('PostDetail');
+    navigation.push('PostDetail');
   };
   const { user } = useAuthContext();
 
@@ -102,14 +102,14 @@ const Post = ({ post }) => {
   const handleGoToProfile = () => {
     // tempory hard code
     if (isOwn) {
-      navigation.navigate('Profile');
+      navigation.push('Profile');
     } else {
-      navigation.navigate('ProfileX', { id: post?.userId?._id });
+      navigation.push('ProfileX', { id: post?.userId?._id });
     }
   };
 
   const handleClickComment = () => {
-    navigation.navigate('Comments', { post });
+    navigation.push('Comments', { post });
   };
 
   const [likeCnt, setLikeCnt] = useState(post?.line_cnt);

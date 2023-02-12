@@ -133,7 +133,7 @@ const PostDetailScreen = () => {
   function onPressCommentsHandler() {
     // const { showingPost } = this.props;
     // const { comments } = showingPost.postDetail;
-    navigation.navigate('Comments', {
+    navigation.push('Comments', {
       comments: mockComments,
     });
   }

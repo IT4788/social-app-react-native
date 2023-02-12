@@ -45,7 +45,7 @@ const ConversationItem = ({
     <View style={styles.container}>
       <TouchableOpacity
         style={styles.conversation}
-        onPress={() => navigation.navigate('Messages')}
+        onPress={() => navigation.push('Messages')}
       >
         <TouchableOpacity
           onPress={() => setModalVisible((currentValue) => !currentValue)}

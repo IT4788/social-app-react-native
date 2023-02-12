@@ -26,7 +26,7 @@ const ChatHeader = ({ username, picture, onlineStatus, onPress }) => {
         <View style={styles.options}>
           <TouchableOpacity
             onPress={() =>
-              navigation.navigate('OnCallScreen', {
+              navigation.push('OnCallScreen', {
                 username: username,
                 picture: picture,
               })

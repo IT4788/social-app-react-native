@@ -17,7 +17,7 @@ const FriendsShowing = ({
   const { user } = useAuthContext();
 
   function onPressViewAllFriendsHandler() {
-    navigation.navigate('FullFriends', { id: userId });
+    navigation.push('FullFriends', { id: userId });
   }
 
   return (
@@ -55,11 +55,11 @@ const FriendsShowing = ({
               activeOpacity={0.8}
               onPress={() => {
                 if (friend._id === user?._id) {
-                  navigation.navigate('Profile');
+                  navigation.push('Profile');
                   return;
                 }
 
-                navigation.navigate('ProfileX', { id: friend._id });
+                navigation.push('ProfileX', { id: friend._id });
               }}
             >
               <Image
@@ -91,7 +91,7 @@ const FriendsShowing = ({
       {!isUserX && (
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate('RequestedFriends');
+            navigation.push('RequestedFriends');
           }}
           activeOpacity={0.8}
           style={styles.btnViewAllFriends}

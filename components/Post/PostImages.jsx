@@ -13,7 +13,7 @@ const PostImages = ({ postId, images }) => {
   const navigation = useNavigation();
 
   const handleShowPostDetail = (image) => {
-    navigation.navigate('PostDetail', { id: postId, image });
+    navigation.push('PostDetail', { id: postId, image });
   };
 
   if (!images?.length) return null;

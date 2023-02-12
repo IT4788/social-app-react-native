@@ -72,7 +72,7 @@ const ToolBar = () => {
   const { user } = useAuthContext();
 
   const onClickAddPost = () => {
-    navigation.navigate('AddPost');
+    navigation.push('AddPost');
   };
   return (
     <>
@@ -80,7 +80,7 @@ const ToolBar = () => {
         <HeaderRow>
           <TouchableOpacity
             onPress={() => {
-              navigation.navigate('Profile');
+              navigation.push('Profile');
             }}
           >
             <Avatar source={{ uri: getUserAvatar(user) }} />

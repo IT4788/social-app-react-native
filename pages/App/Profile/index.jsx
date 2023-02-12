@@ -75,7 +75,7 @@ const ProfileScreen = () => {
   function onPressEditPublicInfoHandler() {
     // const user = { ...this.props.user };
     // const highlightPhotos = [...this.props.highlightPhotos];
-    navigation.navigate('EditPublicInfo', {
+    navigation.push('EditPublicInfo', {
       // userInfo: user,
       // highlightPhotos,
     });
@@ -120,7 +120,6 @@ const ProfileScreen = () => {
       perPage: ITEMS_PER_PAGE,
       numberPage: currentPage + 1,
     }).then((data) => {
-      console.log('Get post success: ', data);
       setTotalPage(
         Math.ceil(Number(data.data?.data.pagination.total) / ITEMS_PER_PAGE),
       );
