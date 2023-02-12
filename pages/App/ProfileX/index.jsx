@@ -67,12 +67,14 @@ const ProfileXScreen = () => {
     cancelFriendRequest(user._id);
   };
 
+  console.log('Profile x user: ', user);
+
   const renderButton = () => {
     switch (friendStatus) {
       case 'approved':
         return (
           <TouchableOpacity
-            onPress={() => navigation.navigate('Messages')}
+            onPress={() => navigation.push('Messages')}
             activeOpacity={0.8}
             style={styles.btnAddStory}
           >

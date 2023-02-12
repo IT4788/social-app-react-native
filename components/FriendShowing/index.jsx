@@ -40,9 +40,11 @@ const FriendsShowing = ({
                 color: '#333',
               }}
             >
-              {totalFriend} friends
+              {totalFriend} {totalFriend > 1 ? 'Friends' : 'Friend'}
               {(isUserX === true) & (mututalCount > 0)
-                ? ` (${mututalCount} mutual friends)`
+                ? ` (${mututalCount} mutual ${
+                    mututalCount > 1 ? 'friends' : 'friend'
+                  })`
                 : ''}
             </AppText>
           </View>

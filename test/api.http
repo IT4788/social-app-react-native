@@ -120,7 +120,7 @@ Authorization: Bearer {{authToken}}
 
 
 ### 12. Get user friends => get_user_friends
-GET {{baseUrl}}/friend/list/63e60d2193d45a34d1067546
+GET {{baseUrl}}/friend/list/63e60d4393d45a34d106754c
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
