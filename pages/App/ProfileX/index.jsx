@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import {
   StyleSheet,
@@ -22,11 +22,18 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { useQuery } from '@tanstack/react-query';
 import { getUserProfile } from '../../../services/user';
 import { Ionicons } from '@expo/vector-icons';
+import {
+  cancelFriendRequest,
+  createFriendRequest,
+  getUserFriends,
+} from '../../../services/friend';
 
 const ProfileXScreen = () => {
   // const isFriend = true;
   const navigation = useNavigation();
   const route = useRoute();
+  const [friendStatus, setFriendStatus] = useState('no_request');
+  const [friendsData, setFriendsData] = useState({});
 
   const id = route.params?.id;
 
@@ -43,11 +50,25 @@ const ProfileXScreen = () => {
   });
   const user = data?.data;
 
+  const handleAddFriend = () => {
+    setFriendStatus('pending');
+    createFriendRequest(user._id);
+  };
+
+  const handleCancelRequest = () => {
+    setFriendStatus('no_request');
+    cancelFriendRequest(user._id);
+  };
+
   const renderButton = () => {
-    switch (user?.friend_status) {
+    switch (friendStatus) {
       case 'approved':
         return (
-          <TouchableOpacity activeOpacity={0.8} style={styles.btnAddStory}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Messages')}
+            activeOpacity={0.8}
+            style={styles.btnAddStory}
+          >
             <FontAwesome5Icon
               size={20}
               color="#fff"
@@ -67,7 +88,11 @@ const ProfileXScreen = () => {
         );
       case 'pending':
         return (
-          <TouchableOpacity activeOpacity={0.8} style={styles.btnAddStory}>
+          <TouchableOpacity
+            onPress={handleCancelRequest}
+            activeOpacity={0.8}
+            style={styles.btnAddStory}
+          >
             {/* <FontAwesome5Icon
             size={20}
             color="#fff"
@@ -88,7 +113,11 @@ const ProfileXScreen = () => {
 
       default:
         return (
-          <TouchableOpacity activeOpacity={0.8} style={styles.btnAddStory}>
+          <TouchableOpacity
+            onPress={handleAddFriend}
+            activeOpacity={0.8}
+            style={styles.btnAddStory}
+          >
             <FontAwesome5Icon size={20} color="#fff" name={'user-plus'} />
             <AppText
               style={{
@@ -104,6 +133,21 @@ const ProfileXScreen = () => {
         );
     }
   };
+
+  useEffect(() => {
+    if (!user) return;
+    setFriendStatus(user.friend_status);
+  }, [user?.friend_status]);
+
+  useEffect(() => {
+    if (!id) return;
+
+    getUserFriends(id)
+      .then((data) => {
+        setFriendsData(data.data.data);
+      })
+      .catch(console.log);
+  }, [id]);
 
   return (
     <View style={styles.superContainer}>
@@ -282,12 +326,11 @@ const ProfileXScreen = () => {
           // style={{ borderBottomWidth: 0.5, borderBottomColor: '#ddd' }}
           ></View>
           <FriendsShowing
-            friends={[
-              {
-                name: 'Dao Cam Tu',
-                avatar_url: 'https://randomuser.me/api/portraits/women/79.jpg',
-              },
-            ]}
+            friends={friendsData?.friends || []}
+            totalFriend={friendsData?.pagination?.total || 0}
+            isUserX
+            mututalCount={3}
+            userId={user?._id}
           />
         </View>
         <View style={{ marginTop: 20 }}>

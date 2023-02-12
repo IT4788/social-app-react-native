@@ -1,19 +1,23 @@
 import React from 'react';
-import { Text, StyleSheet, View, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Image } from 'react-native';
 import ExTouchableOpacity from '../../components/ExTouchableOpacity';
 import { SCREEN_WIDTH } from '../../constants';
+import { useAuthContext } from '../../context/AuthContext';
 import * as navigation from '../../navigation/helpers';
+import { getUserAvatar } from '../../utils/image';
+import AppText from '../AppText';
 
-const FriendsShowing = ({ friends, isUserX, myFriends }) => {
-  let mututalCount;
-  if (isUserX) {
-    mututalCount =
-      myFriends.filter((friend) => friend.id === userXId)[0]?.mutualFriends ||
-      0;
-  }
+const FriendsShowing = ({
+  userId,
+  friends,
+  isUserX,
+  totalFriend,
+  mututalCount,
+}) => {
+  const { user } = useAuthContext();
 
   function onPressViewAllFriendsHandler() {
-    navigation.navigate('FullFriends');
+    navigation.navigate('FullFriends', { id: userId });
   }
 
   return (
@@ -25,46 +29,51 @@ const FriendsShowing = ({ friends, isUserX, myFriends }) => {
           style={styles.friendsBar}
         >
           <View>
-            <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Friends</Text>
-            <Text style={{ fontSize: 16, fontWeight: '500', color: '#333' }}>
-              {friends.length} friends
-              {(isUserX === true) & (mututalCount > 0)
-                ? `(${mututalCount} mutual friends)`
-                : ''}
-            </Text>
-          </View>
-          {!isUserX && (
-            <TouchableOpacity
-              // onPress={this.onPressFindFriendsHandler}
-              activeOpacity={0.8}
-              style={styles.btnFindFriends}
+            <AppText style={{ fontSize: 20, fontWeight: 'bold' }}>
+              Friends
+            </AppText>
+            <AppText
+              style={{
+                fontSize: 16,
+                marginTop: 4,
+                fontWeight: '500',
+                color: '#333',
+              }}
             >
-              <Text style={{ fontSize: 16, color: '#318bfb' }}>
-                Find friends
-              </Text>
-            </TouchableOpacity>
-          )}
+              {totalFriend} friends
+              {(isUserX === true) & (mututalCount > 0)
+                ? ` (${mututalCount} mutual friends)`
+                : ''}
+            </AppText>
+          </View>
         </TouchableOpacity>
       </View>
       <View style={styles.friendGallery}>
-        {friends.splice(0, 6).map((friend, index) => (
-          <View key={index} style={styles.friendItem}>
+        {friends.slice(0, 6).map((friend) => (
+          <View key={friend._id} style={styles.friendItem}>
             <ExTouchableOpacity
-              // onPress={this.onPressProfileHandler.bind(this, friend.id)}
               activeOpacity={0.8}
+              onPress={() => {
+                if (friend._id === user?._id) {
+                  navigation.navigate('Profile');
+                  return;
+                }
+
+                navigation.navigate('ProfileX', { id: friend._id });
+              }}
             >
               <Image
-                source={{ uri: friend.avatar_url }}
+                source={{ uri: getUserAvatar(friend) }}
                 style={styles.friendAvatar}
               />
             </ExTouchableOpacity>
-            <ExTouchableOpacity
-              // onPress={this.onPressProfileHandler.bind(this, friend.id)}
-              style={{ marginTop: 5 }}
-            >
-              <Text style={{ fontSize: 16, fontWeight: '500' }}>
-                {friend.name}
-              </Text>
+            <ExTouchableOpacity style={{ marginTop: 5 }}>
+              <AppText
+                numberOfLines={1}
+                style={{ fontSize: 16, fontWeight: '500' }}
+              >
+                {friend.username}
+              </AppText>
             </ExTouchableOpacity>
           </View>
         ))}
@@ -74,20 +83,24 @@ const FriendsShowing = ({ friends, isUserX, myFriends }) => {
         activeOpacity={0.8}
         style={styles.btnViewAllFriends}
       >
-        <Text style={{ fontSize: 16, fontWeight: '500' }}>
+        <AppText style={{ fontSize: 16, fontWeight: '500' }}>
           View all friends
-        </Text>
+        </AppText>
       </TouchableOpacity>
 
-      {/* <TouchableOpacity
-        onPress={onPressViewAllFriendsHandler}
-        activeOpacity={0.8}
-        style={styles.btnViewAllFriends}
-      >
-        <Text style={{ fontSize: 16, fontWeight: '500' }}>
-          View requested friends
-        </Text>
-      </TouchableOpacity> */}
+      {!isUserX && (
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate('RequestedFriends');
+          }}
+          activeOpacity={0.8}
+          style={styles.btnViewAllFriends}
+        >
+          <AppText style={{ fontSize: 16, fontWeight: '500' }}>
+            View requested friends
+          </AppText>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
@@ -111,11 +124,12 @@ const styles = StyleSheet.create({
   friendGallery: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    // justifyContent: 'space-between',
   },
   friendItem: {
     width: (SCREEN_WIDTH - 30 - 20) / 3,
     marginBottom: 15,
+    marginRight: 15,
   },
   friendAvatar: {
     width: (SCREEN_WIDTH - 30 - 20) / 3,
@@ -131,5 +145,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#ddd',
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 10,
   },
 });

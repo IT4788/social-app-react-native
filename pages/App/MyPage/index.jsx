@@ -78,7 +78,7 @@ const MyPageScreen = () => {
           </View>
         </ExTouchableOpacity> */}
         <ExTouchableOpacity
-          onPress={() => navigation.navigate('FullFriends')}
+          onPress={() => navigation.navigate('FullFriends', { id: user?._id })}
           style={styles.btnOption}
         >
           <Image

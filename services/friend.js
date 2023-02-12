@@ -8,6 +8,10 @@ export const cancelFriendRequest = (userId) => {
   return client.delete(`friend/${userId}`);
 };
 
+export const deleteFriend = (userId) => {
+  return client.delete(`friend/destroy/${userId}`);
+};
+
 export function getRequestingFriend(config) {
   return client.get('friend/requested/sent', { params: config });
 }
@@ -24,6 +28,6 @@ export function rejectRequest(userId) {
   return client.patch(`friend/reject/${userId}`);
 }
 
-export function getUserFriends(userId) {
-  return client.get(`friend/list/${userId}`);
+export function getUserFriends(userId, config) {
+  return client.get(`friend/list/${userId}`, { params: config });
 }

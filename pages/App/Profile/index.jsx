@@ -25,6 +25,7 @@ import { Ionicons } from '@expo/vector-icons';
 import useUpload from '../../../hooks/useUpload';
 import AppText from '../../../components/AppText';
 import { getUserPosts } from '../../../services/post';
+import { getUserFriends } from '../../../services/friend';
 
 const SCREEN_WIDTH = Math.round(Dimensions.get('window').width);
 
@@ -37,6 +38,7 @@ const ProfileScreen = () => {
   const [userPosts, setUserPosts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
+  const [friendsData, setFriendsData] = useState({});
   const id = loggedInUser?._id;
 
   const { handleUploadFile, handleOpenImageLib } = useUpload();
@@ -126,6 +128,24 @@ const ProfileScreen = () => {
       setCurrentPage(Number(data.data?.data?.pagination?.page));
     });
   }
+
+  // const { friendsData } = useQuery(
+  //   ['user', 'friends', { numberPage: 1 }],
+  //   () => getUserFriends(id),
+  //   {
+  //     select: (data) => data.data.data,
+  //   },
+  // );
+
+  useEffect(() => {
+    if (!id) return;
+
+    getUserFriends(id)
+      .then((data) => {
+        setFriendsData(data.data.data);
+      })
+      .catch(console.log);
+  }, [id]);
 
   return (
     <View style={styles.container}>
@@ -306,13 +326,9 @@ const ProfileScreen = () => {
                 </TouchableOpacity>
               </View>
               <FriendsShowing
-                friends={[
-                  {
-                    name: 'Dao Cam Tu',
-                    avatar_url:
-                      'https://randomuser.me/api/portraits/women/79.jpg',
-                  },
-                ]}
+                friends={friendsData?.friends || []}
+                totalFriend={friendsData?.pagination?.total || 0}
+                userId={user?._id}
               />
             </View>
             <View style={{ marginTop: 20 }}>
