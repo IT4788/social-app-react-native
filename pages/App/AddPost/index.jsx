@@ -12,8 +12,9 @@ import { v4 as uuid } from 'uuid';
 import { getUserAvatar } from '../../../utils/image';
 import { useAuthContext } from '../../../context/AuthContext';
 import useUpload from '../../../hooks/useUpload';
-import { useMutation } from '@tanstack/react-query';
-import { addPost } from '../../../services/post';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { addPost, getPostDetail, updatePost } from '../../../services/post';
+import { useRoute } from '@react-navigation/native';
 
 const Container = styled.SafeAreaView`
   background-color: #fff;
@@ -119,11 +120,33 @@ Footer.Icons = styled(View)`
 const MAX_IMAGE_ALLOWED = 4;
 
 const AddPostScreen = ({ navigation }) => {
+  const route = useRoute();
   const [text, setText] = useState('');
   const [images, setImages] = useState([]);
 
   const { user } = useAuthContext();
   const { handleOpenImageLib, handleUploadFile } = useUpload();
+  const id = route.params?.id;
+
+  const { data } = useQuery(['post', 'detail', id], () => getPostDetail(id), {
+    enabled: !!id,
+    select: (data) => data.data,
+    onSuccess(data) {
+      console.log('Get post detail success: ', data);
+    },
+    refetchOnWindowFocus: false,
+    refetchInterval: false,
+    refetchIntervalInBackground: false,
+  });
+
+  const post = data?.data?.post;
+
+  useEffect(() => {
+    if (!post) return;
+
+    setText(post.describe);
+    setImages(post.images?.map((u) => ({ uri: u, id: uuid() })) || []);
+  }, [post]);
 
   // const handleSelectPhoto = async () => {
   //   if (Platform.OS !== 'web') {
@@ -205,17 +228,29 @@ const AddPostScreen = ({ navigation }) => {
     },
   });
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!text.trim() && !images.length) {
       alert('Please enter text or select images');
       return;
     }
 
-    addPostMutation({
-      describe: text.trim(),
-      images: images.map((i) => i.uri),
-      // baseUrl: 'http'
-    });
+    if (!id) {
+      addPostMutation({
+        describe: text.trim(),
+        images: images.map((i) => i.uri),
+        // baseUrl: 'http'
+      });
+    } else {
+      await updatePost(id, {
+        describe: text.trim(),
+        images: images.map((i) => i.uri),
+        // baseUrl: 'http'
+      });
+
+      setText('');
+      setImages([]);
+      navigation.push('Profile');
+    }
   };
 
   useEffect(() => {

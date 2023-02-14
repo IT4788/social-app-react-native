@@ -13,3 +13,7 @@ export const getNewFeeds = (config) => {
 };
 
 export const getPostDetail = (postId) => client.get(`post/${postId}`);
+
+export const deletePost = (postId) => client.delete(`post/${postId}`);
+
+export const updatePost = (postId, data) => client.put(`post/${postId}`, data);

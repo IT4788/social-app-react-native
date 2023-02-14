@@ -93,7 +93,10 @@ Authorization: Bearer {{authToken}}
 
 
 ### 8. Delete post => delete_post
-
+DELETE  {{baseUrl}}/post/63e74cc04581538b8e22aef7
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
 
 ### 9. Get newfeed, get user posts => get_list_posts
 ### User's posts

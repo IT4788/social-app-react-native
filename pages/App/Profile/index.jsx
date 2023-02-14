@@ -390,7 +390,14 @@ const ProfileScreen = () => {
           </View>
         )}
         data={userPosts}
-        renderItem={(item) => <Post post={item.item} />}
+        renderItem={(item) => (
+          <Post
+            post={item.item}
+            onDeletePostSuccess={(id) => {
+              setUserPosts((prev) => prev.filter((p) => p._id !== id));
+            }}
+          />
+        )}
         keyExtractor={(item) => item._id}
         ListFooterComponent={null}
         onEndReached={handleLoadMorePost}

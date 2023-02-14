@@ -4,7 +4,6 @@ import { TouchableOpacity, View } from 'react-native';
 import { Entypo, MaterialCommunityIcons } from '@expo/vector-icons';
 import AppText from '../AppText';
 import styled from 'styled-components/native';
-import * as navigation from '../../navigation/helpers';
 import { useAuthContext } from '../../context/AuthContext';
 import { getUserAvatar } from '../../utils/image';
 import dayjs from 'dayjs';
@@ -12,6 +11,9 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import PostImages from './PostImages';
 import { useMutation } from '@tanstack/react-query';
 import { createReaction } from '../../services/reaction';
+import { deletePost } from '../../services/post';
+import { AntDesign } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
 const Container = styled.View`
   /* flex: 1; */
@@ -91,7 +93,8 @@ const BottomDivider = styled.View`
 
 dayjs.extend(relativeTime);
 
-const Post = ({ post }) => {
+const Post = ({ post, onDeletePostSuccess }) => {
+  const navigation = useNavigation();
   const handleShowPostDetail = () => {
     if (post?.images.length) {
       navigation.push('PostDetail', { id: post._id });
@@ -116,6 +119,10 @@ const Post = ({ post }) => {
     navigation.push('Comments', { id: post._id });
   };
 
+  const handleClickEditPost = () => {
+    navigation.push('AddPost', { id: post._id });
+  };
+
   const [likeCnt, setLikeCnt] = useState(post?.line_cnt);
   const [isLiked, setIsLiked] = useState(post?.is_liked);
 
@@ -131,6 +138,11 @@ const Post = ({ post }) => {
       setLikeCnt((prev) => prev + 1);
     }
     mutate({ postId: post?._id, reactType: 'like' });
+  };
+
+  const handleRemovePost = async (id) => {
+    await deletePost(id);
+    onDeletePostSuccess?.(id);
   };
 
   useEffect(() => {
@@ -216,16 +228,38 @@ const Post = ({ post }) => {
             <AppText>Comment</AppText>
           </Button>
 
-          <Button>
-            <Icon>
-              <MaterialCommunityIcons
-                name="share-outline"
-                size={20}
-                color="#424040"
-              />
-            </Icon>
-            <AppText>Share</AppText>
-          </Button>
+          {isOwn ? (
+            <Button onPress={handleClickEditPost}>
+              <Icon>
+                <AntDesign name="edit" size={20} color="#424040" />
+              </Icon>
+              <AppText>Edit</AppText>
+            </Button>
+          ) : null}
+
+          {isOwn ? (
+            <Button onPress={() => handleRemovePost(post?._id)}>
+              <Icon>
+                <MaterialCommunityIcons
+                  name="delete-outline"
+                  size={20}
+                  color="#424040"
+                />
+              </Icon>
+              <AppText>Remove</AppText>
+            </Button>
+          ) : (
+            <Button>
+              <Icon>
+                <MaterialCommunityIcons
+                  name="share-outline"
+                  size={20}
+                  color="#424040"
+                />
+              </Icon>
+              <AppText>Share</AppText>
+            </Button>
+          )}
         </FooterMenu>
       </Footer>
       <BottomDivider />
