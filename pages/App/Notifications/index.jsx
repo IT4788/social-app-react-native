@@ -4,43 +4,56 @@ import AppText from '../../../components/AppText';
 import ExTouchableOpacity from '../../../components/ExTouchableOpacity';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import NotificationList from '../../../components/NotificationList';
-import { notificationTypes, reactionTypes } from '../../../constants';
+import { reactionTypes } from '../../../constants';
+import { useQuery } from '@tanstack/react-query';
+import { useAuthContext } from '../../../context/AuthContext';
+import { getNotifications } from '../../../services/notification';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 
-const mockNotis = [
-  {
-    reactionType: reactionTypes.LIKE,
-    type: notificationTypes.ANYONE_REACT_YOUR_POST,
-    create_at: '10 mins ago',
-    isSeen: true,
-    user: {
-      name: 'Luong Dao',
-      avatar_url:
-        'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=046c29138c1335ef8edee7daf521ba50',
-    },
-  },
-  {
-    reactionType: reactionTypes.LIKE,
-    type: notificationTypes.ANYONE_REACT_YOUR_POST,
-    create_at: '10 mins ago',
-    user: {
-      name: 'Luong Dao',
-      avatar_url:
-        'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=046c29138c1335ef8edee7daf521ba50',
-    },
-  },
-  {
-    reactionType: reactionTypes.LIKE,
-    type: notificationTypes.ANYONE_REACT_YOUR_POST,
-    create_at: '10 mins ago',
-    user: {
-      name: 'Luong Dao',
-      avatar_url:
-        'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=046c29138c1335ef8edee7daf521ba50',
-    },
-  },
-];
+dayjs.extend(relativeTime);
+
+// function mapType(type) {
+//   switch (type) {
+//     case 'new_comment_on_post':
+//       return notificationTypes.ANYONE_COMMENT_POST_OF_ANYONE_TOO;
+//     case 'new_post_reaction':
+//       return notificationTypes.ANYONE_REACT_YOUR_POST;
+
+//     default:
+//       break;
+//   }
+// }
 
 const NotificationScreen = () => {
+  const { user } = useAuthContext();
+  const { data } = useQuery(
+    ['notifications', user._id],
+    () => getNotifications({ perPage: 100 }),
+    {
+      enabled: !!user._id,
+      onSuccess(data) {
+        console.log(data);
+      },
+      select(data) {
+        return data.data.data;
+      },
+    },
+  );
+
+  const notifications = (data?.notifications || []).map((noti) => {
+    return {
+      id: noti._id,
+      create_at: dayjs(noti.createdAt).fromNow(),
+      reactionType:
+        noti.type === 'new_post_reaction' ? reactionTypes.LIKE : null,
+      type: noti.type,
+      content: noti.content,
+      avatar: noti.avatar,
+      linkPost: noti.linkPost,
+    };
+  });
+
   return (
     <ScrollView
       bounces={false}
@@ -56,11 +69,15 @@ const NotificationScreen = () => {
           <FontAwesome5Icon name="search" size={18} />
         </ExTouchableOpacity>
       </View>
-      <AppText style={styles.notiTitle}>New</AppText>
-      <NotificationList notifications={mockNotis.slice(0, 2)} />
-      {/* <VerticalRecommendFriends /> */}
-      <AppText style={styles.notiTitle}>Before that</AppText>
-      <NotificationList notifications={mockNotis.slice(2)} />
+      {notifications?.length ? (
+        <>
+          <AppText style={styles.notiTitle}>New</AppText>
+          <NotificationList notifications={notifications.slice(0, 2)} />
+          {/* <VerticalRecommendFriends /> */}
+          <AppText style={styles.notiTitle}>Before that</AppText>
+          <NotificationList notifications={notifications.slice(2)} />
+        </>
+      ) : null}
     </ScrollView>
   );
 };

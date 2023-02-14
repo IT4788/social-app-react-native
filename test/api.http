@@ -90,6 +90,10 @@ Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
 ### 7. Edit post => edit_post
+PUT  {{baseUrl}}/post/63e8afc23cf21face8bf9680
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
 
 
 ### 8. Delete post => delete_post
