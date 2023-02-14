@@ -3,7 +3,8 @@ import axios from 'axios';
 
 const client = axios.create({
   // baseURL: 'https://fbcloneapi.onrender.com/api/v1/',
-  baseURL: 'http://192.168.1.13:8000/api/v1/',
+  // baseURL: 'http://192.168.1.13:8000/api/v1/',
+  baseURL: 'http://172.16.1.70:8000/api/v1/',
 });
 
 client.interceptors.request.use(

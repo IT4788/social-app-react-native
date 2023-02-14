@@ -349,7 +349,7 @@ const ProfileXScreen = () => {
                   friends={friendsData?.friends || []}
                   totalFriend={friendsData?.pagination?.total || 0}
                   isUserX
-                  mututalCount={3}
+                  mututalCount={user?.mutual_friend_cnt || 0}
                   userId={user?._id}
                 />
               </View>
